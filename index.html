@@ -4,22 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Personal Finance Tracker</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { margin: 0; font-family: system-ui, -apple-system, sans-serif; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
     </style>
 </head>
 <body class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-    <div id="app" class="p-4">
+    <div class="p-4">
         <div class="max-w-7xl mx-auto">
             <!-- Header -->
             <div class="mb-8">
                 <h1 class="text-4xl font-bold text-slate-800 mb-2">Personal Finance Tracker</h1>
-                <p class="text-slate-600">Dynamic financial planning and wealth tracking</p>
+                <p class="text-slate-600">Dynamic financial planning and wealth tracking for house deposit goal</p>
             </div>
 
             <!-- Navigation -->
-            <div class="flex space-x-1 mb-6 bg-white rounded-lg p-1 shadow-sm">
+            <div class="flex flex-wrap space-x-1 mb-6 bg-white rounded-lg p-1 shadow-sm">
                 <button onclick="showTab('dashboard')" id="tab-dashboard" class="tab-btn flex items-center space-x-2 px-4 py-2 rounded-md transition-all bg-blue-500 text-white shadow-sm">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="22,7 13.5,15.5 8.5,10.5 2,17"></polyline>
@@ -43,12 +46,12 @@
                     </svg>
                     <span>Planning</span>
                 </button>
-                <button onclick="showTab('scenarios')" id="tab-scenarios" class="tab-btn flex items-center space-x-2 px-4 py-2 rounded-md transition-all text-slate-600 hover:bg-slate-100">
+                <button onclick="showTab('adjustments')" id="tab-adjustments" class="tab-btn flex items-center space-x-2 px-4 py-2 rounded-md transition-all text-slate-600 hover:bg-slate-100">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="3"></circle>
                         <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1 1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
                     </svg>
-                    <span>Scenarios</span>
+                    <span>Adjustments</span>
                 </button>
                 <button onclick="showTab('projections')" id="tab-projections" class="tab-btn flex items-center space-x-2 px-4 py-2 rounded-md transition-all text-slate-600 hover:bg-slate-100">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -60,10 +63,10 @@
             </div>
 
             <!-- Dashboard Tab -->
-            <div id="content-dashboard" class="tab-content">
+            <div id="content-dashboard" class="tab-content active">
                 <div class="space-y-6">
                     <!-- Key Metrics -->
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
                             <div class="flex items-center justify-between mb-2">
                                 <h3 class="text-sm font-medium text-slate-500">Total Net Worth</h3>
@@ -72,83 +75,74 @@
                                     <polyline points="16,7 22,7 22,13"></polyline>
                                 </svg>
                             </div>
-                            <p id="total-net-worth" class="text-2xl font-bold text-slate-800">$0</p>
+                            <p id="total-net-worth" class="text-2xl font-bold text-slate-800">$73,500</p>
                         </div>
                         
                         <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
                             <div class="flex items-center justify-between mb-2">
-                                <h3 class="text-sm font-medium text-slate-500">Liquid Cash</h3>
+                                <h3 class="text-sm font-medium text-slate-500">Total Cash</h3>
                                 <svg class="text-blue-500" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <line x1="12" y1="1" x2="12" y2="23"></line>
                                     <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
                                 </svg>
                             </div>
-                            <p id="liquid-cash" class="text-2xl font-bold text-slate-800">$0</p>
+                            <p id="total-cash" class="text-2xl font-bold text-slate-800">$8,500</p>
                         </div>
                         
                         <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
                             <div class="flex items-center justify-between mb-2">
-                                <h3 class="text-sm font-medium text-slate-500">Investments</h3>
+                                <h3 class="text-sm font-medium text-slate-500">Total Investments</h3>
                                 <svg class="text-purple-500" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <polyline points="22,7 13.5,15.5 8.5,10.5 2,17"></polyline>
                                     <polyline points="16,7 22,7 22,13"></polyline>
                                 </svg>
                             </div>
-                            <p id="investments" class="text-2xl font-bold text-slate-800">$0</p>
-                        </div>
-                        
-                        <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
-                            <div class="flex items-center justify-between mb-2">
-                                <h3 class="text-sm font-medium text-slate-500">Available for House</h3>
-                                <svg class="text-orange-500" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                                    <line x1="16" y1="2" x2="16" y2="6"></line>
-                                    <line x1="8" y1="2" x2="8" y2="6"></line>
-                                    <line x1="3" y1="10" x2="21" y2="10"></line>
-                                </svg>
-                            </div>
-                            <p id="available-house" class="text-2xl font-bold text-slate-800">$0</p>
+                            <p id="total-investments" class="text-2xl font-bold text-slate-800">$65,000</p>
                         </div>
                     </div>
 
                     <!-- Current Month Cash Flow -->
                     <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
                         <h3 class="text-lg font-semibold text-slate-800 mb-4">This Month's Cash Flow</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                            <div class="text-center">
-                                <p class="text-sm text-slate-500">Income</p>
-                                <p id="month-income" class="text-xl font-bold text-green-600">+$0</p>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="text-center p-4 bg-green-50 rounded-lg">
+                                <p class="text-sm text-slate-500 mb-1">Total Income</p>
+                                <p id="current-month-income" class="text-xl font-bold text-green-600">$0</p>
                             </div>
-                            <div class="text-center">
-                                <p class="text-sm text-slate-500">Regular Expenses</p>
-                                <p id="month-expenses" class="text-xl font-bold text-red-600">-$0</p>
+                            <div class="text-center p-4 bg-red-50 rounded-lg">
+                                <p class="text-sm text-slate-500 mb-1">Total Expenses</p>
+                                <p id="current-month-expenses" class="text-xl font-bold text-red-600">$3,850</p>
                             </div>
-                            <div class="text-center">
-                                <p class="text-sm text-slate-500">One-off Events</p>
-                                <p id="month-scenarios" class="text-xl font-bold text-slate-600">$0</p>
-                            </div>
-                            <div class="text-center">
-                                <p class="text-sm text-slate-500">Net Flow</p>
-                                <p id="month-net" class="text-xl font-bold text-slate-600">$0</p>
+                            <div class="text-center p-4 bg-blue-50 rounded-lg">
+                                <p class="text-sm text-slate-500 mb-1">Net Flow</p>
+                                <p id="current-month-net" class="text-xl font-bold text-red-600">-$3,850</p>
                             </div>
                         </div>
                     </div>
 
-                    <!-- House Deposit Projections -->
+                    <!-- Date Selector for Projections -->
                     <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
-                        <h3 class="text-lg font-semibold text-slate-800 mb-4">House Deposit Projections</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div class="text-center p-3 bg-orange-50 rounded-lg">
-                                <p class="text-sm text-slate-600">In 6 months</p>
-                                <p id="house-6m" class="text-xl font-bold text-orange-600">$0</p>
-                            </div>
-                            <div class="text-center p-3 bg-orange-50 rounded-lg">
-                                <p class="text-sm text-slate-600">In 12 months</p>
-                                <p id="house-12m" class="text-xl font-bold text-orange-600">$0</p>
-                            </div>
-                            <div class="text-center p-3 bg-orange-50 rounded-lg">
-                                <p class="text-sm text-slate-600">In 18 months</p>
-                                <p id="house-18m" class="text-xl font-bold text-orange-600">$0</p>
+                        <h3 class="text-lg font-semibold text-slate-800 mb-4">Net Worth Projection</h3>
+                        <div class="flex items-center space-x-4 mb-4">
+                            <label class="text-sm font-medium text-slate-700">Select Future Date:</label>
+                            <input type="date" id="projection-date" onchange="updateSelectedDateProjection()" class="px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        
+                        <div id="selected-date-projection" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <!-- Will be populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Quick Wealth Projection Chart -->
+                    <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+                        <h3 class="text-lg font-semibold text-slate-800 mb-4">Wealth Projection (Next 12 Months)</h3>
+                        <div class="h-64">
+                            <canvas id="wealth-chart" width="400" height="200"></canvas>
+                        </div>
+                        <div class="flex justify-center mt-4 text-sm">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-3 h-3 bg-blue-500 rounded"></div>
+                                <span>Base Scenario</span>
                             </div>
                         </div>
                     </div>
@@ -156,37 +150,146 @@
             </div>
 
             <!-- Accounts Tab -->
-            <div id="content-accounts" class="tab-content hidden">
+            <div id="content-accounts" class="tab-content">
                 <div class="space-y-6">
                     <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
-                        <h3 class="text-lg font-semibold text-slate-800 mb-4">Account Balances</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-lg font-semibold text-slate-800">Account Balances</h3>
+                            <button onclick="refreshAllBalances()" class="flex items-center space-x-2 px-3 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="1 4 1 10 7 10"></polyline>
+                                    <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+                                </svg>
+                                <span>Update All Dates</span>
+                            </button>
+                        </div>
+                        
+                        <div class="space-y-8">
+                            <!-- Up Bank -->
                             <div class="space-y-2">
-                                <label class="block text-sm font-medium text-slate-700">Up Bank (Cash)</label>
-                                <div class="flex space-x-2">
-                                    <input type="number" id="account-upBank" oninput="updateAccount('upBank', this.value)" class="flex-1 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="0">
-                                    <span id="date-upBank" class="px-3 py-2 text-sm text-slate-500 bg-slate-50 rounded-md">Updated: Today</span>
+                                <h4 class="text-md font-medium text-slate-800 border-b border-slate-200 pb-2">Up Bank</h4>
+                                <div class="space-y-2">
+                                    <label class="block text-sm font-medium text-slate-700">Up Bank (Cash)</label>
+                                    <div class="flex space-x-2">
+                                        <input type="text" id="account-upBank" onchange="updateAccount('upBank', 'balance', this.value)" class="flex-1 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="$0">
+                                        <span id="date-upBank" class="px-3 py-2 text-sm text-slate-500 bg-slate-50 rounded-md">Updated: 2025-07-25</span>
+                                    </div>
                                 </div>
                             </div>
+
+                            <!-- CommBank Group -->
                             <div class="space-y-2">
-                                <label class="block text-sm font-medium text-slate-700">CommBank Pocket (ETFs)</label>
-                                <div class="flex space-x-2">
-                                    <input type="number" id="account-commBankPocket" oninput="updateAccount('commBankPocket', this.value)" class="flex-1 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="0">
-                                    <span id="date-commBankPocket" class="px-3 py-2 text-sm text-slate-500 bg-slate-50 rounded-md">Updated: Today</span>
+                                <h4 class="text-md font-medium text-slate-800 border-b border-slate-200 pb-2">CommBank</h4>
+                                <div class="space-y-3">
+                                    <div class="space-y-2">
+                                        <label class="block text-sm font-medium text-slate-700">CommBank Pocket (ETFs)</label>
+                                        <div class="flex space-x-2">
+                                            <input type="text" id="account-commBankPocket" onchange="updateAccount('commBankPocket', 'balance', this.value)" class="flex-1 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="$0">
+                                            <span id="date-commBankPocket" class="px-3 py-2 text-sm text-slate-500 bg-slate-50 rounded-md">Updated: 2025-07-24</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="space-y-2">
+                                        <label class="block text-sm font-medium text-slate-700">CommSec (Shares)</label>
+                                        <div class="flex space-x-2">
+                                            <input type="text" id="account-commsec" onchange="updateAccount('commsec', 'balance', this.value)" class="flex-1 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="$0">
+                                            <span id="date-commsec" class="px-3 py-2 text-sm text-slate-500 bg-slate-50 rounded-md">Updated: 2025-07-23</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="space-y-2">
+                                        <label class="block text-sm font-medium text-slate-700">CDIA (Cash)</label>
+                                        <div class="flex space-x-2">
+                                            <input type="text" id="account-commBankCDIA" onchange="updateAccount('commBankCDIA', 'balance', this.value)" class="flex-1 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="$0">
+                                            <span id="date-commBankCDIA" class="px-3 py-2 text-sm text-slate-500 bg-slate-50 rounded-md">Updated: 2025-08-04</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
+
+                            <!-- Stake Group -->
                             <div class="space-y-2">
-                                <label class="block text-sm font-medium text-slate-700">Commsec (Shares)</label>
-                                <div class="flex space-x-2">
-                                    <input type="number" id="account-commsec" oninput="updateAccount('commsec', this.value)" class="flex-1 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="0">
-                                    <span id="date-commsec" class="px-3 py-2 text-sm text-slate-500 bg-slate-50 rounded-md">Updated: Today</span>
+                                <h4 class="text-md font-medium text-slate-800 border-b border-slate-200 pb-2">Stake</h4>
+                                <div class="space-y-3">
+                                    <!-- Stake USD ETFs -->
+                                    <div class="space-y-2">
+                                        <label class="block text-sm font-medium text-slate-700">Stake (US ETFs)</label>
+                                        <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                                            <div>
+                                                <label class="block text-xs text-slate-500 mb-1">USD Amount</label>
+                                                <input type="text" id="account-stakeUSD-USD" onchange="updateAccount('stakeUSD', 'balanceUSD', this.value)" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500" placeholder="$0">
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs text-slate-500 mb-1">AUD Amount (Rate: <span id="exchange-rate-etf">1.6</span>)</label>
+                                                <div class="flex space-x-2">
+                                                    <input type="text" id="account-stakeUSD-AUD" readonly class="flex-1 px-3 py-2 border border-slate-300 rounded-md bg-slate-50">
+                                                    <button onclick="convertUSDToAUD('stakeUSD')" id="convert-btn-etf" class="px-3 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:opacity-50 flex items-center" title="Get live exchange rate">
+                                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                            <polyline points="1 4 1 10 7 10"></polyline>
+                                                            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="flex items-end">
+                                                <span id="date-stakeUSD" class="px-3 py-2 text-sm text-slate-500 bg-slate-50 rounded-md">Updated: 2025-07-22</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Stake USD Cash -->
+                                    <div class="space-y-2">
+                                        <label class="block text-sm font-medium text-slate-700">Stake (US Cash)</label>
+                                        <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                                            <div>
+                                                <label class="block text-xs text-slate-500 mb-1">USD Amount</label>
+                                                <input type="text" id="account-stakeUSDCash-USD" onchange="updateAccount('stakeUSDCash', 'balanceUSD', this.value)" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500" placeholder="$0">
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs text-slate-500 mb-1">AUD Amount (Rate: <span id="exchange-rate-cash">1.6</span>)</label>
+                                                <div class="flex space-x-2">
+                                                    <input type="text" id="account-stakeUSDCash-AUD" readonly class="flex-1 px-3 py-2 border border-slate-300 rounded-md bg-slate-50">
+                                                    <button onclick="convertUSDToAUD('stakeUSDCash')" id="convert-btn-cash" class="px-3 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:opacity-50 flex items-center" title="Get live exchange rate">
+                                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                            <polyline points="1 4 1 10 7 10"></polyline>
+                                                            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="flex items-end">
+                                                <span id="date-stakeUSDCash" class="px-3 py-2 text-sm text-slate-500 bg-slate-50 rounded-md">Updated: 2025-08-04</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Stake AUD Cash -->
+                                    <div class="space-y-2">
+                                        <label class="block text-sm font-medium text-slate-700">Stake (AUD Cash)</label>
+                                        <div class="flex space-x-2">
+                                            <input type="text" id="account-stakeAUDCash" onchange="updateAccount('stakeAUDCash', 'balance', this.value)" class="flex-1 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="$0">
+                                            <span id="date-stakeAUDCash" class="px-3 py-2 text-sm text-slate-500 bg-slate-50 rounded-md">Updated: 2025-08-04</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="space-y-2">
-                                <label class="block text-sm font-medium text-slate-700">Stake (USD ETFs)</label>
-                                <div class="flex space-x-2">
-                                    <input type="number" id="account-stakeUSD" oninput="updateAccount('stakeUSD', this.value)" class="flex-1 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="0">
-                                    <span id="date-stakeUSD" class="px-3 py-2 text-sm text-slate-500 bg-slate-50 rounded-md">Updated: Today</span>
+                        </div>
+
+                        <!-- Account Totals -->
+                        <div class="mt-8 pt-6 border-t border-slate-200">
+                            <h4 class="text-md font-medium text-slate-800 mb-4">Account Totals</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div class="text-center p-4 bg-green-50 rounded-lg">
+                                    <p class="text-sm text-slate-500 mb-1">Total Cash</p>
+                                    <p id="accounts-total-cash" class="text-xl font-bold text-green-600">$0</p>
+                                </div>
+                                <div class="text-center p-4 bg-purple-50 rounded-lg">
+                                    <p class="text-sm text-slate-500 mb-1">Total Investments</p>
+                                    <p id="accounts-total-investments" class="text-xl font-bold text-purple-600">$0</p>
+                                </div>
+                                <div class="text-center p-4 bg-blue-50 rounded-lg">
+                                    <p class="text-sm text-slate-500 mb-1">Grand Total</p>
+                                    <p id="accounts-grand-total" class="text-xl font-bold text-blue-600">$0</p>
                                 </div>
                             </div>
                         </div>
@@ -195,7 +298,7 @@
                     <!-- Temporary Assets -->
                     <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
                         <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-lg font-semibold text-slate-800">Temporary Assets & Money Owed</h3>
+                            <h3 class="text-lg font-semibold text-slate-800">Other Assets</h3>
                             <button onclick="addTemporaryAsset()" class="flex items-center space-x-2 px-3 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -204,36 +307,89 @@
                                 <span>Add Asset</span>
                             </button>
                         </div>
-                        <div id="temporary-assets" class="space-y-3">
-                            <p class="text-slate-500 text-center py-4">No temporary assets added yet</p>
+                        
+                        <div id="temporary-assets-list" class="space-y-3">
+                            <!-- Will be populated by JS -->
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Planning Tab -->
-            <div id="content-planning" class="tab-content hidden">
+            <div id="content-planning" class="tab-content">
                 <div class="space-y-6">
                     <!-- Income Configuration -->
                     <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
                         <h3 class="text-lg font-semibold text-slate-800 mb-4">Income Configuration</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                             <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-2">Monthly Salary</label>
-                                <input type="number" id="monthly-salary" oninput="updateIncome()" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500" value="0">
+                                <label class="block text-sm font-medium text-slate-700 mb-2">Annual salary (exc. super)</label>
+                                <input type="text" id="base-salary" onchange="updateBaseSalary(this.value)" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500">
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-2">Annual Bonus</label>
-                                <input type="number" id="annual-bonus" oninput="updateIncome()" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500" value="0">
+                                <label class="block text-sm font-medium text-slate-700 mb-2">Monthly take-home pay</label>
+                                <div class="flex space-x-2">
+                                    <input type="text" id="monthly-after-tax" readonly class="flex-1 px-3 py-2 border border-slate-300 rounded-md bg-slate-50">
+                                    <button onclick="calculateIncome()" class="px-3 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 flex items-center" title="Calculate with Australian tax rates">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="1 4 1 10 7 10"></polyline>
+                                            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+                                        </svg>
+                                    </button>
+                                </div>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-2">Bonus Confirmed?</label>
-                                <select id="bonus-confirmed" onchange="updateIncome()" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500">
-                                    <option value="false">No</option>
-                                    <option value="true">Yes</option>
+                                <label class="block text-sm font-medium text-slate-700 mb-2">Pay Date (Day of Month)</label>
+                                <select id="pay-date" onchange="updatePayDate(this.value)" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500">
+                                    <!-- Will be populated by JS -->
                                 </select>
                             </div>
+                            <div class="flex items-end">
+                                <p class="text-sm text-slate-600">Uses Australian tax rates with tax-free threshold claimed</p>
+                            </div>
                         </div>
+                    </div>
+
+                    <!-- Future Income Changes -->
+                    <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-semibold text-slate-800">Future Income Changes</h3>
+                            <button onclick="addIncomeChange()" class="flex items-center space-x-2 px-3 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                                <span>Add Income Change</span>
+                            </button>
+                        </div>
+                        
+                        <div id="income-changes-list" class="space-y-3">
+                            <p class="text-slate-500 text-center py-4">No future income changes planned</p>
+                        </div>
+                    </div>
+
+                    <!-- Investment Scenarios -->
+                    <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+                        <h3 class="text-lg font-semibold text-slate-800 mb-4">Investment Scenarios & Settings</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-2">High Scenario (%)</label>
+                                <input type="number" id="high-scenario" onchange="updateInvestmentScenarios()" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500" step="0.1" value="10">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-2">Low Scenario (%)</label>
+                                <input type="number" id="low-scenario" onchange="updateInvestmentScenarios()" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500" step="0.1" value="-10">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-2">Cash Buffer</label>
+                                <input type="text" id="cash-buffer" onchange="updateInvestmentScenarios()" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-2">Investment Ratio (%)</label>
+                                <input type="number" id="investment-ratio" onchange="updateInvestmentScenarios()" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500" step="1" min="0" max="100" value="80">
+                            </div>
+                        </div>
+                        <p class="text-sm text-slate-600 mt-3">Excess cash above the buffer amount will be invested at the specified ratio (e.g., 80% invested, 20% kept as additional cash).</p>
                     </div>
 
                     <!-- Monthly Expenses -->
@@ -242,66 +398,66 @@
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-2">Rent</label>
-                                <input type="number" id="expense-rent" oninput="updateExpenses()" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500" value="0">
+                                <input type="text" id="expense-rent" onchange="updateMonthlyExpenses()" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-2">Utilities</label>
-                                <input type="number" id="expense-utilities" oninput="updateExpenses()" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500" value="0">
+                                <input type="text" id="expense-utilities" onchange="updateMonthlyExpenses()" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-2">Groceries</label>
-                                <input type="number" id="expense-groceries" oninput="updateExpenses()" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500" value="0">
+                                <input type="text" id="expense-groceries" onchange="updateMonthlyExpenses()" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-2">Transport</label>
-                                <input type="number" id="expense-transport" oninput="updateExpenses()" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500" value="0">
+                                <input type="text" id="expense-transport" onchange="updateMonthlyExpenses()" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-2">Entertainment</label>
-                                <input type="number" id="expense-entertainment" oninput="updateExpenses()" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500" value="0">
+                                <input type="text" id="expense-entertainment" onchange="updateMonthlyExpenses()" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-2">Other</label>
-                                <input type="number" id="expense-other" oninput="updateExpenses()" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500" value="0">
+                                <input type="text" id="expense-other" onchange="updateMonthlyExpenses()" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500">
                             </div>
                         </div>
                         <div class="mt-4 p-3 bg-slate-50 rounded-lg">
-                            <p class="text-sm text-slate-600">
-                                Total Monthly Expenses: <span id="total-expenses" class="font-semibold">$0</span>
-                            </p>
+                            <p class="text-sm text-slate-600">Total Monthly Expenses: <span id="total-monthly-expenses" class="font-semibold">$3,850</span></p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Scenarios Tab -->
-            <div id="content-scenarios" class="tab-content hidden">
+            <!-- Adjustments Tab -->
+            <div id="content-adjustments" class="tab-content">
                 <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
                     <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-semibold text-slate-800">One-off Events & Scenarios</h3>
-                        <button onclick="addScenario()" class="flex items-center space-x-2 px-3 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors">
+                        <h3 class="text-lg font-semibold text-slate-800">Additional Financial Adjustments</h3>
+                        <button onclick="addAdjustment()" class="flex items-center space-x-2 px-3 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <line x1="12" y1="5" x2="12" y2="19"></line>
                                 <line x1="5" y1="12" x2="19" y2="12"></line>
                             </svg>
-                            <span>Add Scenario</span>
+                            <span>Add Adjustment</span>
                         </button>
                     </div>
-                    <div id="scenarios-list" class="space-y-3">
-                        <p class="text-slate-500 text-center py-4">No scenarios added yet</p>
+                    
+                    <div id="adjustments-list" class="space-y-3">
+                        <!-- Will be populated by JS -->
                     </div>
                 </div>
             </div>
 
             <!-- Projections Tab -->
-            <div id="content-projections" class="tab-content hidden">
+            <div id="content-projections" class="tab-content">
                 <div class="space-y-6">
+                    <!-- Projection Controls -->
                     <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="text-lg font-semibold text-slate-800">Projection Settings</h3>
                             <div class="flex items-center space-x-2">
                                 <label class="text-sm font-medium text-slate-700">Months to project:</label>
-                                <select id="projection-months" onchange="updateProjections()" class="px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500">
+                                <select id="projection-months" onchange="updateProjectionMonths(this.value)" class="px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500">
                                     <option value="6">6 months</option>
                                     <option value="12" selected>12 months</option>
                                     <option value="18">18 months</option>
@@ -311,23 +467,53 @@
                         </div>
                     </div>
 
+                    <!-- Wealth Projection Chart -->
                     <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
-                        <h3 class="text-lg font-semibold text-slate-800 mb-4">Monthly Projections</h3>
+                        <h3 class="text-lg font-semibold text-slate-800 mb-4">Wealth Projection with Investment Scenarios</h3>
+                        <div class="h-80">
+                            <canvas id="detailed-wealth-chart" width="400" height="320"></canvas>
+                        </div>
+                        <div class="flex flex-wrap justify-center space-x-6 mt-4 text-sm gap-2">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-3 h-3 bg-green-500 rounded"></div>
+                                <span>Cash</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <div class="w-3 h-3 bg-purple-500 rounded"></div>
+                                <span>Investments</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <div class="w-3 h-3 bg-blue-500 rounded"></div>
+                                <span>Total (Base)</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <div class="w-3 h-3 bg-green-600 rounded"></div>
+                                <span>High Scenario</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <div class="w-3 h-3 bg-red-500 rounded"></div>
+                                <span>Low Scenario</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Projection Data Table -->
+                    <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+                        <h3 class="text-lg font-semibold text-slate-800 mb-4">Projection Details</h3>
                         <div class="overflow-x-auto">
-                            <table class="w-full table-auto">
+                            <table class="w-full text-sm">
                                 <thead>
                                     <tr class="border-b border-slate-200">
-                                        <th class="text-left py-2 text-sm font-medium text-slate-700">Month</th>
-                                        <th class="text-right py-2 text-sm font-medium text-slate-700">Cash</th>
-                                        <th class="text-right py-2 text-sm font-medium text-slate-700">Investments</th>
-                                        <th class="text-right py-2 text-sm font-medium text-slate-700">Total</th>
-                                        <th class="text-right py-2 text-sm font-medium text-slate-700">For House</th>
+                                        <th class="text-left py-2 px-3 font-medium text-slate-700">Month</th>
+                                        <th class="text-right py-2 px-3 font-medium text-slate-700">Cash</th>
+                                        <th class="text-right py-2 px-3 font-medium text-slate-700">Investments</th>
+                                        <th class="text-right py-2 px-3 font-medium text-slate-700">Total</th>
+                                        <th class="text-right py-2 px-3 font-medium text-green-600">High</th>
+                                        <th class="text-right py-2 px-3 font-medium text-red-600">Low</th>
                                     </tr>
                                 </thead>
-                                <tbody id="projections-table">
-                                    <tr>
-                                        <td colspan="5" class="text-center py-4 text-slate-500">Add your financial data to see projections</td>
-                                    </tr>
+                                <tbody id="projections-table-body">
+                                    <!-- Will be populated by JS -->
                                 </tbody>
                             </table>
                         </div>
@@ -337,383 +523,927 @@
         </div>
     </div>
 
-    <script>
-        // Global data store
-        let appData = {
-            accounts: {
-                upBank: { balance: 0, lastUpdated: new Date().toISOString().slice(0, 10) },
-                commBankPocket: { balance: 0, lastUpdated: new Date().toISOString().slice(0, 10) },
-                commsec: { balance: 0, lastUpdated: new Date().toISOString().slice(0, 10) },
-                stakeUSD: { balance: 0, lastUpdated: new Date().toISOString().slice(0, 10) }
+<script>
+// Global application state - updated with new accounts
+let appState = {
+    accounts: {
+        upBank: { balance: 8500, lastUpdated: '4 Aug 2025' },
+        commBankPocket: { balance: 45000, lastUpdated: '4 Aug 2025' },
+        commsec: { balance: 12000, lastUpdated: '4 Aug 2025' },
+        commBankCDIA: { balance: 0, lastUpdated: '4 Aug 2025' },
+        stakeUSD: { balanceUSD: 5000, balanceAUD: 8000, exchangeRate: 1.6, lastUpdated: '4 Aug 2025' },
+        stakeUSDCash: { balanceUSD: 0, balanceAUD: 0, exchangeRate: 1.6, lastUpdated: '4 Aug 2025' },
+        stakeAUDCash: { balance: 0, lastUpdated: '4 Aug 2025' }
+    },
+    temporaryAssets: [
+        { id: 1, description: "Security deposit - apartment", amount: 1500, returnDate: "2025-11-30" }
+    ],
+    income: {
+        baseSalary: 90000,
+        monthlySalary: 0,
+        isCalculated: false,
+        payDate: 1
+    },
+    incomeChanges: [],
+    monthlyExpenses: {
+        rent: 2200,
+        utilities: 200,
+        groceries: 600,
+        transport: 150,
+        entertainment: 400,
+        other: 300
+    },
+    adjustments: [
+        { id: 1, description: "November Holiday", amount: 2500, date: "2025-11-01", type: "expense", enabled: true },
+        { id: 2, description: "Christmas Expenses", amount: 1200, date: "2025-12-01", type: "expense", enabled: true },
+        { id: 3, description: "Tax Refund", amount: 3000, date: "2025-08-15", type: "income", enabled: true }
+    ],
+    investmentScenarios: {
+        highPercentage: 10,
+        lowPercentage: -10,
+        cashBuffer: 5000,
+        investmentRatio: 80
+    },
+    projectionMonths: 12,
+    selectedDate: new Date().toISOString().slice(0, 10)
+};
+
+// Helper Functions
+function formatCurrency(amount) {
+    if (amount === 0 || amount === null || amount === undefined || amount === '') return '$0';
+    return `$${Math.round(amount).toLocaleString()}`;
+}
+
+function parseCurrency(value) {
+    if (!value || value === '' || value === '$0') return 0;
+    
+    if (typeof value === 'string') {
+        let cleanValue = value.replace(/[$,]/g, '');
+        if (cleanValue === '-') return 0;
+        const parsed = parseFloat(cleanValue);
+        return isNaN(parsed) ? 0 : parsed;
+    }
+    
+    return parseFloat(value) || 0;
+}
+
+// Australian Tax Calculation - Updated for 2025-26 Tax Year
+function calculateMonthlySalary(annualSalary = appState.income.baseSalary) {
+    if (!annualSalary) return 0;
+
+    let tax = 0;
+    
+    // Tax-free threshold: $0 - $18,200
+    if (annualSalary > 18200) {
+        // 16% on $18,201 - $45,000 (UPDATED from 19%)
+        tax += Math.min(annualSalary - 18200, 45000 - 18200) * 0.16;
+    }
+    if (annualSalary > 45000) {
+        // 30% on $45,001 - $135,000 (UPDATED from 32.5% and $120,000)
+        tax += Math.min(annualSalary - 45000, 135000 - 45000) * 0.30;
+    }
+    if (annualSalary > 135000) {
+        // 37% on $135,001 - $190,000 (UPDATED bracket start from $120,000 to $135,000)
+        tax += Math.min(annualSalary - 135000, 190000 - 135000) * 0.37;
+    }
+    if (annualSalary > 190000) {
+        // 45% on $190,001+ (UPDATED from $180,001+)
+        tax += (annualSalary - 190000) * 0.45;
+    }
+
+    // Medicare levy (2% for income over $23,226)
+    if (annualSalary > 23226) {
+        tax += annualSalary * 0.02;
+    }
+
+    const afterTax = annualSalary - tax;
+    return afterTax / 12;
+}
+    
+// Currency Conversion with API - Updated to handle multiple accounts
+async function convertUSDToAUD(accountKey) {
+    const convertBtn = document.getElementById(accountKey === 'stakeUSD' ? 'convert-btn-etf' : 'convert-btn-cash');
+    convertBtn.disabled = true;
+    convertBtn.innerHTML = '<svg class="animate-spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>';
+    
+    try {
+        const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+        const data = await response.json();
+        
+        let rate = 1.55; // Fallback rate
+        if (data.rates && data.rates.AUD) {
+            rate = data.rates.AUD;
+        } else {
+            alert('Unable to fetch live exchange rates. Using approximate rate of 1.55.');
+        }
+        
+        const audAmount = appState.accounts[accountKey].balanceUSD * rate;
+        
+        appState.accounts[accountKey].balanceAUD = Math.round(audAmount);
+        appState.accounts[accountKey].exchangeRate = Math.round(rate * 10000) / 10000;
+        appState.accounts[accountKey].lastUpdated = new Date().toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' });
+        
+        updateAccountsDisplay();
+        updateDashboard();
+        saveData();
+    } catch (error) {
+        console.error('Currency conversion failed:', error);
+        alert('Currency conversion failed. Using existing exchange rate.');
+    }
+    
+    convertBtn.disabled = false;
+    convertBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>';
+}
+
+// Calculate current totals - Updated for new account structure
+function getCurrentTotals() {
+    // Cash accounts: Up Bank + CDIA + Stake USD Cash + Stake AUD Cash
+    const totalCash = appState.accounts.upBank.balance + 
+                     appState.accounts.commBankCDIA.balance + 
+                     appState.accounts.stakeUSDCash.balanceAUD + 
+                     appState.accounts.stakeAUDCash.balance;
+    
+    // Investment accounts: CommBank Pocket + CommSec + Stake USD ETFs
+    const totalInvestments = appState.accounts.commBankPocket.balance + 
+                            appState.accounts.commsec.balance + 
+                            appState.accounts.stakeUSD.balanceAUD;
+    
+    const tempAssetsTotal = appState.temporaryAssets.reduce((sum, asset) => sum + asset.amount, 0);
+    const totalNetWorth = totalCash + totalInvestments + tempAssetsTotal;
+    
+    return { 
+        totalNetWorth, 
+        totalCash, 
+        totalInvestments, 
+        tempAssetsTotal,
+        // Keep legacy field for compatibility
+        liquidCash: appState.accounts.upBank.balance,
+        investments: totalInvestments
+    };
+}
+
+// Get effective salary for a given date (considering income changes)
+function getEffectiveSalary(date) {
+    if (!appState.income.isCalculated) return 0;
+    
+    const targetDate = new Date(date);
+    let effectiveSalary = appState.income.baseSalary;
+    
+    const applicableChanges = appState.incomeChanges
+        .filter(change => change.enabled && new Date(change.effectiveDate) <= targetDate)
+        .sort((a, b) => new Date(a.effectiveDate) - new Date(b.effectiveDate));
+    
+    for (const change of applicableChanges) {
+        effectiveSalary = change.newSalary;
+    }
+    
+    return calculateMonthlySalary(effectiveSalary);
+}
+
+// Generate monthly projections - Updated to use new total calculations
+function generateProjections() {
+    const results = [];
+    const today = new Date();
+    const currentTotals = getCurrentTotals();
+    let runningCash = currentTotals.totalCash;
+    let runningInvestments = currentTotals.totalInvestments;
+    
+    const monthlyExpenseTotal = Object.values(appState.monthlyExpenses).reduce((sum, exp) => sum + exp, 0);
+    
+    for (let i = 0; i <= appState.projectionMonths; i++) {
+        const projDate = new Date(today.getFullYear(), today.getMonth() + i, 1);
+        const monthStr = projDate.toISOString().slice(0, 7);
+        
+        const monthlySalary = getEffectiveSalary(projDate);
+        
+        runningCash += monthlySalary;
+        runningCash -= monthlyExpenseTotal;
+        
+        const monthAdjustments = appState.adjustments.filter(a => 
+            a.enabled && a.date.startsWith(monthStr)
+        );
+        
+        monthAdjustments.forEach(adjustment => {
+            if (adjustment.type === 'income') {
+                runningCash += adjustment.amount;
+            } else {
+                runningCash -= adjustment.amount;
+            }
+        });
+        
+        // Smart cash flow management - invest excess cash
+        if (runningCash > appState.investmentScenarios.cashBuffer) {
+            const excessCash = runningCash - appState.investmentScenarios.cashBuffer;
+            const investAmount = excessCash * (appState.investmentScenarios.investmentRatio / 100);
+            runningInvestments += investAmount;
+            runningCash = appState.investmentScenarios.cashBuffer + (excessCash - investAmount);
+        }
+        
+        const totalWealth = runningCash + runningInvestments + currentTotals.tempAssetsTotal;
+        
+        const investmentHigh = runningInvestments * (1 + appState.investmentScenarios.highPercentage / 100);
+        const investmentLow = runningInvestments * (1 + appState.investmentScenarios.lowPercentage / 100);
+        
+        results.push({
+            month: projDate.toLocaleDateString('en-AU', { month: 'short', year: 'numeric' }),
+            date: projDate.toISOString().slice(0, 10),
+            cash: Math.round(runningCash),
+            investments: Math.round(runningInvestments),
+            investmentHigh: Math.round(investmentHigh),
+            investmentLow: Math.round(investmentLow),
+            total: Math.round(totalWealth),
+            totalHigh: Math.round(runningCash + investmentHigh + currentTotals.tempAssetsTotal),
+            totalLow: Math.round(runningCash + investmentLow + currentTotals.tempAssetsTotal)
+        });
+    }
+    
+    return results;
+}
+
+// Get current month cash flow
+function getCurrentMonthFlow() {
+    const today = new Date();
+    const currentMonth = today.toISOString().slice(0, 7);
+    const monthlyExpenseTotal = Object.values(appState.monthlyExpenses).reduce((sum, exp) => sum + exp, 0);
+    const monthlySalary = getEffectiveSalary(today);
+    
+    const monthIncomeAdjustments = appState.adjustments.filter(a => 
+        a.enabled && a.date.startsWith(currentMonth) && a.type === 'income'
+    ).reduce((sum, a) => sum + a.amount, 0);
+    
+    const monthExpenseAdjustments = appState.adjustments.filter(a => 
+        a.enabled && a.date.startsWith(currentMonth) && a.type === 'expense'
+    ).reduce((sum, a) => sum + a.amount, 0);
+    
+    return {
+        income: monthlySalary + monthIncomeAdjustments,
+        expenses: monthlyExpenseTotal + monthExpenseAdjustments,
+        net: monthlySalary + monthIncomeAdjustments - monthlyExpenseTotal - monthExpenseAdjustments
+    };
+}
+
+// Tab Management
+function showTab(tabName) {
+    // Hide all content
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+    });
+    
+    // Reset all tab buttons
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.className = 'tab-btn flex items-center space-x-2 px-4 py-2 rounded-md transition-all text-slate-600 hover:bg-slate-100';
+    });
+    
+    // Show selected content and highlight button
+    document.getElementById('content-' + tabName).classList.add('active');
+    document.getElementById('tab-' + tabName).className = 'tab-btn flex items-center space-x-2 px-4 py-2 rounded-md transition-all bg-blue-500 text-white shadow-sm';
+    
+    // Update content when switching tabs
+    if (tabName === 'projections') {
+        updateProjectionsTab();
+    }
+}
+
+// Account Management - Updated for new accounts
+function updateAccount(accountKey, field, value) {
+    const numValue = parseCurrency(value);
+    appState.accounts[accountKey][field] = numValue;
+    appState.accounts[accountKey].lastUpdated = new Date().toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' });
+    
+    // Update USD/AUD conversion if needed
+    if ((accountKey === 'stakeUSD' || accountKey === 'stakeUSDCash') && field === 'balanceUSD') {
+        appState.accounts[accountKey].balanceAUD = Math.round(numValue * appState.accounts[accountKey].exchangeRate);
+        const audInputId = accountKey === 'stakeUSD' ? 'account-stakeUSD-AUD' : 'account-stakeUSDCash-AUD';
+        document.getElementById(audInputId).value = formatCurrency(appState.accounts[accountKey].balanceAUD);
+    }
+    
+    updateAccountsDisplay();
+    updateDashboard();
+    saveData();
+}
+
+function refreshAllBalances() {
+    const today = new Date().toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' });
+    Object.keys(appState.accounts).forEach(key => {
+        appState.accounts[key].lastUpdated = today;
+    });
+    updateAccountsDisplay();
+    saveData();
+}
+
+// Income Management
+function updateBaseSalary(value) {
+    appState.income.baseSalary = parseCurrency(value);
+    appState.income.isCalculated = false;
+    document.getElementById('monthly-after-tax').value = '$0';
+    saveData();
+}
+
+function calculateIncome() {
+    const monthly = calculateMonthlySalary();
+    appState.income.monthlySalary = monthly;
+    appState.income.isCalculated = true;
+    document.getElementById('monthly-after-tax').value = formatCurrency(monthly);
+    updateDashboard();
+    saveData();
+}
+
+function updatePayDate(value) {
+    appState.income.payDate = parseInt(value);
+    saveData();
+}
+
+// Income Changes Management
+function addIncomeChange() {
+    const newId = Math.max(...appState.incomeChanges.map(ic => ic.id), 0) + 1;
+    appState.incomeChanges.push({
+        id: newId,
+        description: "Salary increase",
+        newSalary: appState.income.baseSalary,
+        effectiveDate: new Date().toISOString().slice(0, 10),
+        enabled: true
+    });
+    renderIncomeChanges();
+    updateDashboard();
+    saveData();
+}
+
+function updateIncomeChange(id, field, value) {
+    const index = appState.incomeChanges.findIndex(ic => ic.id === id);
+    if (index !== -1) {
+        if (field === 'newSalary') {
+            appState.incomeChanges[index][field] = parseCurrency(value);
+        } else {
+            appState.incomeChanges[index][field] = value;
+        }
+        updateDashboard();
+        saveData();
+    }
+}
+
+function deleteIncomeChange(id) {
+    appState.incomeChanges = appState.incomeChanges.filter(ic => ic.id !== id);
+    renderIncomeChanges();
+    updateDashboard();
+    saveData();
+}
+
+// Monthly Expenses Management
+function updateMonthlyExpenses() {
+    const expenseTypes = ['rent', 'utilities', 'groceries', 'transport', 'entertainment', 'other'];
+    let total = 0;
+    
+    expenseTypes.forEach(type => {
+        const value = parseCurrency(document.getElementById('expense-' + type).value);
+        appState.monthlyExpenses[type] = value;
+        total += value;
+    });
+    
+    document.getElementById('total-monthly-expenses').textContent = formatCurrency(total);
+    updateDashboard();
+    saveData();
+}
+
+// Adjustments Management
+function addAdjustment() {
+    const newId = Math.max(...appState.adjustments.map(a => a.id), 0) + 1;
+    appState.adjustments.push({
+        id: newId,
+        description: "New Event",
+        amount: 0,
+        date: new Date().toISOString().slice(0, 10),
+        type: "expense",
+        enabled: true
+    });
+    renderAdjustments();
+    updateDashboard();
+    saveData();
+}
+
+function updateAdjustment(id, field, value) {
+    const index = appState.adjustments.findIndex(a => a.id === id);
+    if (index !== -1) {
+        if (field === 'amount') {
+            appState.adjustments[index][field] = parseCurrency(value);
+        } else {
+            appState.adjustments[index][field] = value;
+        }
+        updateDashboard();
+        saveData();
+    }
+}
+
+function deleteAdjustment(id) {
+    appState.adjustments = appState.adjustments.filter(a => a.id !== id);
+    renderAdjustments();
+    updateDashboard();
+    saveData();
+}
+
+// Temporary Assets Management
+function addTemporaryAsset() {
+    const newId = Math.max(...appState.temporaryAssets.map(a => a.id), 0) + 1;
+    appState.temporaryAssets.push({
+        id: newId,
+        description: "New temporary asset",
+        amount: 0,
+        returnDate: new Date().toISOString().slice(0, 10)
+    });
+    renderTemporaryAssets();
+    updateDashboard();
+    saveData();
+}
+
+function updateTemporaryAsset(id, field, value) {
+    const index = appState.temporaryAssets.findIndex(a => a.id === id);
+    if (index !== -1) {
+        if (field === 'amount') {
+            appState.temporaryAssets[index][field] = parseCurrency(value);
+        } else {
+            appState.temporaryAssets[index][field] = value;
+        }
+        updateDashboard();
+        saveData();
+    }
+}
+
+function deleteTemporaryAsset(id) {
+    appState.temporaryAssets = appState.temporaryAssets.filter(a => a.id !== id);
+    renderTemporaryAssets();
+    updateDashboard();
+    saveData();
+}
+
+// Investment Scenarios Management
+function updateInvestmentScenarios() {
+    appState.investmentScenarios.highPercentage = parseFloat(document.getElementById('high-scenario').value) || 0;
+    appState.investmentScenarios.lowPercentage = parseFloat(document.getElementById('low-scenario').value) || 0;
+    appState.investmentScenarios.cashBuffer = parseCurrency(document.getElementById('cash-buffer').value);
+    appState.investmentScenarios.investmentRatio = parseFloat(document.getElementById('investment-ratio').value) || 0;
+    updateDashboard();
+    saveData();
+}
+
+function updateProjectionMonths(value) {
+    appState.projectionMonths = parseInt(value);
+    updateDashboard();
+    saveData();
+}
+
+// Rendering Functions
+function renderTemporaryAssets() {
+    const container = document.getElementById('temporary-assets-list');
+    
+    if (appState.temporaryAssets.length === 0) {
+        container.innerHTML = '<p class="text-slate-500 text-center py-4">No temporary assets added yet</p>';
+        return;
+    }
+    
+    let html = '';
+    appState.temporaryAssets.forEach(asset => {
+        html += `
+        <div class="flex flex-wrap space-x-3 items-center p-3 bg-slate-50 rounded-lg gap-2">
+            <input type="text" value="${asset.description}" onchange="updateTemporaryAsset(${asset.id}, 'description', this.value)" class="flex-1 min-w-48 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500" placeholder="Description">
+            <input type="text" value="${formatCurrency(asset.amount)}" onchange="updateTemporaryAsset(${asset.id}, 'amount', this.value)" class="w-32 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500" placeholder="$0">
+            <input type="date" value="${asset.returnDate}" onchange="updateTemporaryAsset(${asset.id}, 'returnDate', this.value)" class="w-40 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500">
+            <button onclick="deleteTemporaryAsset(${asset.id})" class="p-2 text-red-500 hover:bg-red-50 rounded-md">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="3,6 5,6 21,6"></polyline>
+                    <path d="M19,6V20a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6M8,6V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2V6"></path>
+                </svg>
+            </button>
+        </div>`;
+    });
+    
+    container.innerHTML = html;
+}
+
+function renderIncomeChanges() {
+    const container = document.getElementById('income-changes-list');
+    
+    if (appState.incomeChanges.length === 0) {
+        container.innerHTML = '<p class="text-slate-500 text-center py-4">No future income changes planned</p>';
+        return;
+    }
+    
+    let html = '';
+    appState.incomeChanges.forEach(incomeChange => {
+        const eyeIcon = incomeChange.enabled ? 
+            '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>' :
+            '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+        
+        html += `
+        <div class="flex flex-wrap space-x-3 items-center p-3 bg-slate-50 rounded-lg gap-2">
+            <button onclick="updateIncomeChange(${incomeChange.id}, 'enabled', ${!incomeChange.enabled})" class="p-2 rounded-md ${incomeChange.enabled ? 'text-green-600 bg-green-50' : 'text-slate-400 bg-slate-100'}">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${eyeIcon}</svg>
+            </button>
+            <input type="text" value="${incomeChange.description}" onchange="updateIncomeChange(${incomeChange.id}, 'description', this.value)" class="flex-1 min-w-48 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500" placeholder="Description (e.g., Promotion, New job)">
+            <input type="text" value="${formatCurrency(incomeChange.newSalary)}" onchange="updateIncomeChange(${incomeChange.id}, 'newSalary', this.value)" class="w-40 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500" placeholder="New annual salary">
+            <input type="date" value="${incomeChange.effectiveDate}" onchange="updateIncomeChange(${incomeChange.id}, 'effectiveDate', this.value)" class="w-40 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500">
+            <button onclick="deleteIncomeChange(${incomeChange.id})" class="p-2 text-red-500 hover:bg-red-50 rounded-md">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="3,6 5,6 21,6"></polyline>
+                    <path d="M19,6V20a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6M8,6V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2V6"></path>
+                </svg>
+            </button>
+        </div>`;
+    });
+    
+    container.innerHTML = html;
+}
+
+function renderAdjustments() {
+    const container = document.getElementById('adjustments-list');
+    
+    if (appState.adjustments.length === 0) {
+        container.innerHTML = '<p class="text-slate-500 text-center py-4">No adjustments added yet</p>';
+        return;
+    }
+    
+    let html = '';
+    appState.adjustments.forEach(adjustment => {
+        const eyeIcon = adjustment.enabled ? 
+            '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>' :
+            '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+        
+        html += `
+        <div class="flex flex-wrap space-x-3 items-center p-3 bg-slate-50 rounded-lg gap-2">
+            <button onclick="updateAdjustment(${adjustment.id}, 'enabled', ${!adjustment.enabled})" class="p-2 rounded-md ${adjustment.enabled ? 'text-green-600 bg-green-50' : 'text-slate-400 bg-slate-100'}">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${eyeIcon}</svg>
+            </button>
+            <select onchange="updateAdjustment(${adjustment.id}, 'type', this.value)" class="w-32 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 text-sm">
+                <option value="income" ${adjustment.type === 'income' ? 'selected' : ''}>Income</option>
+                <option value="expense" ${adjustment.type === 'expense' ? 'selected' : ''}>Expense</option>
+            </select>
+            <input type="text" value="${adjustment.description}" onchange="updateAdjustment(${adjustment.id}, 'description', this.value)" class="flex-1 min-w-48 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500" placeholder="Description">
+            <input type="text" value="${formatCurrency(adjustment.amount)}" onchange="updateAdjustment(${adjustment.id}, 'amount', this.value)" class="w-32 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500" placeholder="$0">
+            <input type="date" value="${adjustment.date}" onchange="updateAdjustment(${adjustment.id}, 'date', this.value)" class="w-40 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500">
+            <button onclick="deleteAdjustment(${adjustment.id})" class="p-2 text-red-500 hover:bg-red-50 rounded-md">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="3,6 5,6 21,6"></polyline>
+                    <path d="M19,6V20a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6M8,6V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2V6"></path>
+                </svg>
+            </button>
+        </div>`;
+    });
+    
+    container.innerHTML = html;
+}
+
+// Chart Management
+let wealthChart = null;
+let detailedWealthChart = null;
+
+function createWealthChart() {
+    const ctx = document.getElementById('wealth-chart').getContext('2d');
+    const projections = generateProjections();
+    const chartData = projections.slice(0, 13);
+    
+    if (wealthChart) {
+        wealthChart.destroy();
+    }
+    
+    wealthChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: chartData.map(p => p.month),
+            datasets: [
+                {
+                    label: 'Base Scenario',
+                    data: chartData.map(p => p.total),
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    borderWidth: 3,
+                    fill: false,
+                    tension: 0.1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    ticks: {
+                        callback: function(value) {
+                            return '$' + (value/1000).toFixed(0) + 'k';
+                        }
+                    }
+                }
             },
-            income: {
-                monthlySalary: 0,
-                annualBonus: { amount: 0, confirmed: false }
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.dataset.label + ': $' + context.parsed.y.toLocaleString();
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function createDetailedWealthChart() {
+    const ctx = document.getElementById('detailed-wealth-chart').getContext('2d');
+    const projections = generateProjections();
+    
+    if (detailedWealthChart) {
+        detailedWealthChart.destroy();
+    }
+    
+    detailedWealthChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: projections.map(p => p.month),
+            datasets: [
+                {
+                    label: 'Cash',
+                    data: projections.map(p => p.cash),
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    borderWidth: 2,
+                    fill: false,
+                    tension: 0.1
+                },
+                {
+                    label: 'Investments',
+                    data: projections.map(p => p.investments),
+                    borderColor: '#8b5cf6',
+                    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                    borderWidth: 2,
+                    fill: false,
+                    tension: 0.1
+                },
+                {
+                    label: 'Total Wealth',
+                    data: projections.map(p => p.total),
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    borderWidth: 3,
+                    fill: false,
+                    tension: 0.1
+                },
+                {
+                    label: 'High Scenario',
+                    data: projections.map(p => p.totalHigh),
+                    borderColor: '#22c55e',
+                    backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    fill: false,
+                    tension: 0.1
+                },
+                {
+                    label: 'Low Scenario',
+                    data: projections.map(p => p.totalLow),
+                    borderColor: '#ef4444',
+                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    fill: false,
+                    tension: 0.1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    ticks: {
+                        callback: function(value) {
+                            return '$' + (value/1000).toFixed(0) + 'k';
+                        }
+                    }
+                }
             },
-            expenses: {
-                rent: 0, utilities: 0, groceries: 0, transport: 0, entertainment: 0, other: 0
-            },
-            temporaryAssets: [],
-            scenarios: [],
-            projectionMonths: 12
-        };
-
-        // Load/Save functions
-        function loadData() {
-            try {
-                const saved = localStorage.getItem('financeTrackerData');
-                if (saved) {
-                    appData = { ...appData, ...JSON.parse(saved) };
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.dataset.label + ': $' + context.parsed.y.toLocaleString();
+                        }
+                    }
                 }
-            } catch (e) {
-                console.error('Failed to load data:', e);
             }
         }
+    });
+}
 
-        function saveData() {
-            try {
-                localStorage.setItem('financeTrackerData', JSON.stringify(appData));
-            } catch (e) {
-                console.error('Failed to save data:', e);
+// Update Functions - Updated for new account structure
+function updateAccountsDisplay() {
+    // Update all account inputs
+    document.getElementById('account-upBank').value = formatCurrency(appState.accounts.upBank.balance);
+    document.getElementById('account-commBankPocket').value = formatCurrency(appState.accounts.commBankPocket.balance);
+    document.getElementById('account-commsec').value = formatCurrency(appState.accounts.commsec.balance);
+    document.getElementById('account-commBankCDIA').value = formatCurrency(appState.accounts.commBankCDIA.balance);
+    document.getElementById('account-stakeUSD-USD').value = formatCurrency(appState.accounts.stakeUSD.balanceUSD);
+    document.getElementById('account-stakeUSD-AUD').value = formatCurrency(appState.accounts.stakeUSD.balanceAUD);
+    document.getElementById('account-stakeUSDCash-USD').value = formatCurrency(appState.accounts.stakeUSDCash.balanceUSD);
+    document.getElementById('account-stakeUSDCash-AUD').value = formatCurrency(appState.accounts.stakeUSDCash.balanceAUD);
+    document.getElementById('account-stakeAUDCash').value = formatCurrency(appState.accounts.stakeAUDCash.balance);
+    
+    // Update dates
+    document.getElementById('date-upBank').textContent = 'Updated: ' + appState.accounts.upBank.lastUpdated;
+    document.getElementById('date-commBankPocket').textContent = 'Updated: ' + appState.accounts.commBankPocket.lastUpdated;
+    document.getElementById('date-commsec').textContent = 'Updated: ' + appState.accounts.commsec.lastUpdated;
+    document.getElementById('date-commBankCDIA').textContent = 'Updated: ' + appState.accounts.commBankCDIA.lastUpdated;
+    document.getElementById('date-stakeUSD').textContent = 'Updated: ' + appState.accounts.stakeUSD.lastUpdated;
+    document.getElementById('date-stakeUSDCash').textContent = 'Updated: ' + appState.accounts.stakeUSDCash.lastUpdated;
+    document.getElementById('date-stakeAUDCash').textContent = 'Updated: ' + appState.accounts.stakeAUDCash.lastUpdated;
+    
+    // Update exchange rates
+    document.getElementById('exchange-rate-etf').textContent = appState.accounts.stakeUSD.exchangeRate;
+    document.getElementById('exchange-rate-cash').textContent = appState.accounts.stakeUSDCash.exchangeRate;
+    
+    // Update account totals
+    const totals = getCurrentTotals();
+    document.getElementById('accounts-total-cash').textContent = formatCurrency(totals.totalCash);
+    document.getElementById('accounts-total-investments').textContent = formatCurrency(totals.totalInvestments);
+    document.getElementById('accounts-grand-total').textContent = formatCurrency(totals.totalNetWorth);
+}
+
+function updatePlanningDisplay() {
+    document.getElementById('base-salary').value = formatCurrency(appState.income.baseSalary);
+    document.getElementById('monthly-after-tax').value = appState.income.isCalculated ? formatCurrency(appState.income.monthlySalary) : '$0';
+    document.getElementById('pay-date').value = appState.income.payDate;
+    
+    // Populate pay date options
+    let payDateOptions = '';
+    for (let i = 1; i <= 28; i++) {
+        payDateOptions += `<option value="${i}" ${appState.income.payDate === i ? 'selected' : ''}>${i}</option>`;
+    }
+    document.getElementById('pay-date').innerHTML = payDateOptions;
+    
+    // Update expenses
+    Object.keys(appState.monthlyExpenses).forEach(key => {
+        document.getElementById('expense-' + key).value = formatCurrency(appState.monthlyExpenses[key]);
+    });
+    
+    // Update investment scenarios
+    document.getElementById('high-scenario').value = appState.investmentScenarios.highPercentage;
+    document.getElementById('low-scenario').value = appState.investmentScenarios.lowPercentage;
+    document.getElementById('cash-buffer').value = formatCurrency(appState.investmentScenarios.cashBuffer);
+    document.getElementById('investment-ratio').value = appState.investmentScenarios.investmentRatio;
+    
+    const monthlyExpenseTotal = Object.values(appState.monthlyExpenses).reduce((sum, exp) => sum + exp, 0);
+    document.getElementById('total-monthly-expenses').textContent = formatCurrency(monthlyExpenseTotal);
+}
+
+function updateSelectedDateProjection() {
+    const selectedDate = document.getElementById('projection-date').value;
+    if (!selectedDate) return;
+    
+    const selected = new Date(selectedDate);
+    const today = new Date();
+    const monthsDiff = (selected.getFullYear() - today.getFullYear()) * 12 + 
+                      (selected.getMonth() - today.getMonth());
+    
+    if (monthsDiff < 0) return;
+    
+    const projections = generateProjections();
+    const projection = projections[Math.min(monthsDiff, projections.length - 1)];
+    
+    if (projection) {
+        document.getElementById('selected-date-projection').innerHTML = `
+            <div class="text-center p-4 bg-blue-50 rounded-lg">
+                <p class="text-sm text-slate-600 mb-1">Base Scenario</p>
+                <p class="text-2xl font-bold text-blue-600">${formatCurrency(projection.total)}</p>
+            </div>
+            <div class="text-center p-4 bg-green-50 rounded-lg">
+                <p class="text-sm text-slate-600 mb-1">High Scenario (+${appState.investmentScenarios.highPercentage}%)</p>
+                <p class="text-2xl font-bold text-green-600">${formatCurrency(projection.totalHigh)}</p>
+            </div>
+            <div class="text-center p-4 bg-red-50 rounded-lg">
+                <p class="text-sm text-slate-600 mb-1">Low Scenario (${appState.investmentScenarios.lowPercentage}%)</p>
+                <p class="text-2xl font-bold text-red-600">${formatCurrency(projection.totalLow)}</p>
+            </div>
+        `;
+    }
+}
+
+function updateProjectionsTab() {
+    const projections = generateProjections();
+    
+    // Update table
+    const tableBody = document.getElementById('projections-table-body');
+    let tableHtml = '';
+    
+    projections.slice(0, 13).forEach(proj => {
+        tableHtml += `
+        <tr class="border-b border-slate-100">
+            <td class="py-2 px-3 text-slate-700">${proj.month}</td>
+            <td class="py-2 px-3 text-right text-green-600">${formatCurrency(proj.cash)}</td>
+            <td class="py-2 px-3 text-right text-purple-600">${formatCurrency(proj.investments)}</td>
+            <td class="py-2 px-3 text-right font-medium text-slate-800">${formatCurrency(proj.total)}</td>
+            <td class="py-2 px-3 text-right text-green-600">${formatCurrency(proj.totalHigh)}</td>
+            <td class="py-2 px-3 text-right text-red-600">${formatCurrency(proj.totalLow)}</td>
+        </tr>`;
+    });
+    
+    tableBody.innerHTML = tableHtml;
+    
+    // Update detailed chart
+    createDetailedWealthChart();
+}
+
+function updateDashboard() {
+    const currentTotals = getCurrentTotals();
+    const currentMonthFlow = getCurrentMonthFlow();
+    
+    // Update key metrics - changed to show new totals structure
+    document.getElementById('total-net-worth').textContent = formatCurrency(currentTotals.totalNetWorth);
+    document.getElementById('total-cash').textContent = formatCurrency(currentTotals.totalCash);
+    document.getElementById('total-investments').textContent = formatCurrency(currentTotals.totalInvestments);
+    
+    // Update current month cash flow
+    document.getElementById('current-month-income').textContent = formatCurrency(currentMonthFlow.income);
+    document.getElementById('current-month-expenses').textContent = formatCurrency(currentMonthFlow.expenses);
+    document.getElementById('current-month-net').textContent = (currentMonthFlow.net >= 0 ? '+' : '') + formatCurrency(currentMonthFlow.net);
+    
+    // Update net flow color
+    const netElement = document.getElementById('current-month-net');
+    netElement.className = `text-xl font-bold ${currentMonthFlow.net >= 0 ? 'text-green-600' : 'text-red-600'}`;
+    
+    // Update chart
+    createWealthChart();
+    
+    // Update selected date projection
+    updateSelectedDateProjection();
+}
+
+// Data Persistence
+function saveData() {
+    try {
+        localStorage.setItem('advancedFinanceTracker', JSON.stringify(appState));
+    } catch (e) {
+        console.error('Failed to save data:', e);
+    }
+}
+
+function loadData() {
+    try {
+        const saved = localStorage.getItem('advancedFinanceTracker');
+        if (saved) {
+            const loadedState = JSON.parse(saved);
+            // Merge with default state to handle new fields
+            appState = { ...appState, ...loadedState };
+            
+            // Ensure new accounts exist with defaults
+            if (!appState.accounts.commBankCDIA) {
+                appState.accounts.commBankCDIA = { balance: 0, lastUpdated: '4 Aug 2025' };
+            }
+            if (!appState.accounts.stakeUSDCash) {
+                appState.accounts.stakeUSDCash = { balanceUSD: 0, balanceAUD: 0, exchangeRate: 1.6, lastUpdated: '4 Aug 2025' };
+            }
+            if (!appState.accounts.stakeAUDCash) {
+                appState.accounts.stakeAUDCash = { balance: 0, lastUpdated: '4 Aug 2025' };
             }
         }
+    } catch (e) {
+        console.error('Failed to load data:', e);
+    }
+}
 
-        // Tab functions
-        function showTab(tabName) {
-            // Hide all tabs
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.tab-btn').forEach(el => {
-                el.className = 'tab-btn flex items-center space-x-2 px-4 py-2 rounded-md transition-all text-slate-600 hover:bg-slate-100';
-            });
-            
-            // Show selected tab
-            document.getElementById(`content-${tabName}`).classList.remove('hidden');
-            document.getElementById(`tab-${tabName}`).className = 'tab-btn flex items-center space-x-2 px-4 py-2 rounded-md transition-all bg-blue-500 text-white shadow-sm';
-        }
+// Initialization
+function initializeApp() {
+    loadData();
+    
+    // Set up projection date input
+    document.getElementById('projection-date').value = appState.selectedDate;
+    document.getElementById('projection-date').min = new Date().toISOString().slice(0, 10);
+    
+    // Update all displays
+    updateAccountsDisplay();
+    updatePlanningDisplay();
+    
+    // Auto-calculate income if base salary exists but isn't calculated
+    if (appState.income.baseSalary > 0 && !appState.income.isCalculated) {
+        calculateIncome();
+    }
+    
+    renderTemporaryAssets();
+    renderIncomeChanges();
+    renderAdjustments();
+    updateDashboard();
+    
+    console.log('Enhanced Finance Tracker loaded successfully!');
+}
 
-        // Account functions
-        function updateAccount(accountKey, value) {
-            const balance = parseFloat(value) || 0;
-            appData.accounts[accountKey] = {
-                balance: balance,
-                lastUpdated: new Date().toISOString().slice(0, 10)
-            };
-            document.getElementById(`date-${accountKey}`).textContent = `Updated: ${appData.accounts[accountKey].lastUpdated}`;
-            saveData();
-            updateDashboard();
-        }
+// Event Listeners
+document.addEventListener('DOMContentLoaded', initializeApp);
 
-        function updateIncome() {
-            appData.income.monthlySalary = parseFloat(document.getElementById('monthly-salary').value) || 0;
-            appData.income.annualBonus.amount = parseFloat(document.getElementById('annual-bonus').value) || 0;
-            appData.income.annualBonus.confirmed = document.getElementById('bonus-confirmed').value === 'true';
-            saveData();
-            updateDashboard();
-        }
-
-        function updateExpenses() {
-            const expenseTypes = ['rent', 'utilities', 'groceries', 'transport', 'entertainment', 'other'];
-            expenseTypes.forEach(type => {
-                appData.expenses[type] = parseFloat(document.getElementById(`expense-${type}`).value) || 0;
-            });
-            
-            const total = Object.values(appData.expenses).reduce((sum, val) => sum + val, 0);
-            document.getElementById('total-expenses').textContent = `${total.toLocaleString()}`;
-            
-            saveData();
-            updateDashboard();
-        }
-
-        function addTemporaryAsset() {
-            const id = Date.now();
-            appData.temporaryAssets.push({
-                id: id,
-                description: "New temporary asset",
-                amount: 0,
-                returnDate: new Date().toISOString().slice(0, 10)
-            });
-            saveData();
-            renderTemporaryAssets();
-            updateDashboard();
-        }
-
-        function updateTemporaryAsset(id, field, value) {
-            const asset = appData.temporaryAssets.find(a => a.id === id);
-            if (asset) {
-                if (field === 'amount') {
-                    asset[field] = parseFloat(value) || 0;
-                } else {
-                    asset[field] = value;
-                }
-                saveData();
-                updateDashboard();
-            }
-        }
-
-        function deleteTemporaryAsset(id) {
-            appData.temporaryAssets = appData.temporaryAssets.filter(a => a.id !== id);
-            saveData();
-            renderTemporaryAssets();
-            updateDashboard();
-        }
-
-        function addScenario() {
-            const id = Date.now();
-            appData.scenarios.push({
-                id: id,
-                description: "New Event",
-                amount: 0,
-                date: new Date().toISOString().slice(0, 10),
-                enabled: true
-            });
-            saveData();
-            renderScenarios();
-            updateDashboard();
-        }
-
-        function updateScenario(id, field, value) {
-            const scenario = appData.scenarios.find(s => s.id === id);
-            if (scenario) {
-                if (field === 'amount') {
-                    scenario[field] = parseFloat(value) || 0;
-                } else if (field === 'enabled') {
-                    scenario[field] = value;
-                } else {
-                    scenario[field] = value;
-                }
-                saveData();
-                renderScenarios();
-                updateDashboard();
-            }
-        }
-
-        function deleteScenario(id) {
-            appData.scenarios = appData.scenarios.filter(s => s.id !== id);
-            saveData();
-            renderScenarios();
-            updateDashboard();
-        }
-
-        function renderTemporaryAssets() {
-            const container = document.getElementById('temporary-assets');
-            if (appData.temporaryAssets.length === 0) {
-                container.innerHTML = '<p class="text-slate-500 text-center py-4">No temporary assets added yet</p>';
-                return;
-            }
-
-            container.innerHTML = appData.temporaryAssets.map(asset => `
-                <div class="flex space-x-3 items-center p-3 bg-slate-50 rounded-lg">
-                    <input type="text" value="${asset.description}" onchange="updateTemporaryAsset(${asset.id}, 'description', this.value)" class="flex-1 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500" placeholder="Description">
-                    <input type="number" value="${asset.amount}" onchange="updateTemporaryAsset(${asset.id}, 'amount', this.value)" class="w-32 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500" placeholder="Amount">
-                    <input type="date" value="${asset.returnDate}" onchange="updateTemporaryAsset(${asset.id}, 'returnDate', this.value)" class="w-40 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500">
-                    <button onclick="deleteTemporaryAsset(${asset.id})" class="p-2 text-red-500 hover:bg-red-50 rounded-md">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="3,6 5,6 21,6"></polyline>
-                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                            <line x1="10" y1="11" x2="10" y2="17"></line>
-                            <line x1="14" y1="11" x2="14" y2="17"></line>
-                        </svg>
-                    </button>
-                </div>
-            `).join('');
-        }
-
-        function renderScenarios() {
-            const container = document.getElementById('scenarios-list');
-            if (appData.scenarios.length === 0) {
-                container.innerHTML = '<p class="text-slate-500 text-center py-4">No scenarios added yet</p>';
-                return;
-            }
-
-            container.innerHTML = appData.scenarios.map(scenario => `
-                <div class="flex space-x-3 items-center p-3 bg-slate-50 rounded-lg">
-                    <button onclick="updateScenario(${scenario.id}, 'enabled', ${!scenario.enabled})" class="p-2 rounded-md ${scenario.enabled ? 'text-green-600 bg-green-50' : 'text-slate-400 bg-slate-100'}">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            ${scenario.enabled ? 
-                                '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>' :
-                                '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>'
-                            }
-                        </svg>
-                    </button>
-                    <input type="text" value="${scenario.description}" onchange="updateScenario(${scenario.id}, 'description', this.value)" class="flex-1 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500" placeholder="Event description">
-                    <input type="number" value="${scenario.amount}" onchange="updateScenario(${scenario.id}, 'amount', this.value)" class="w-32 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500" placeholder="Amount">
-                    <input type="date" value="${scenario.date}" onchange="updateScenario(${scenario.id}, 'date', this.value)" class="w-40 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500">
-                    <button onclick="deleteScenario(${scenario.id})" class="p-2 text-red-500 hover:bg-red-50 rounded-md">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="3,6 5,6 21,6"></polyline>
-                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                            <line x1="10" y1="11" x2="10" y2="17"></line>
-                            <line x1="14" y1="11" x2="14" y2="17"></line>
-                        </svg>
-                    </button>
-                </div>
-            `).join('');
-        }
-
-        function calculateProjections() {
-            const projections = [];
-            const today = new Date();
-            let runningCash = appData.accounts.upBank.balance;
-            let runningInvestments = Object.values(appData.accounts).reduce((sum, acc) => sum + acc.balance, 0) - runningCash;
-            
-            const monthlyExpenseTotal = Object.values(appData.expenses).reduce((sum, exp) => sum + exp, 0);
-            const tempAssetsTotal = appData.temporaryAssets.reduce((sum, asset) => sum + asset.amount, 0);
-            
-            for (let i = 0; i <= appData.projectionMonths; i++) {
-                const projDate = new Date(today.getFullYear(), today.getMonth() + i, 1);
-                const monthStr = projDate.toISOString().slice(0, 7);
-                
-                // Add monthly salary
-                runningCash += appData.income.monthlySalary;
-                
-                // Subtract monthly expenses
-                runningCash -= monthlyExpenseTotal;
-                
-                // Apply scenarios for this month
-                const monthScenarios = appData.scenarios.filter(s => 
-                    s.enabled && s.date.startsWith(monthStr)
-                );
-                monthScenarios.forEach(scenario => {
-                    runningCash += scenario.amount;
-                });
-                
-                // Add annual bonus if applicable (October)
-                if (projDate.getMonth() === 9 && appData.income.annualBonus.confirmed) {
-                    runningCash += appData.income.annualBonus.amount;
-                }
-                
-                // Invest excess cash
-                if (runningCash > 5000) {
-                    const excessCash = runningCash - 5000;
-                    runningInvestments += excessCash * 0.8;
-                    runningCash = 5000 + (excessCash * 0.2);
-                }
-                
-                const totalWealth = runningCash + runningInvestments + tempAssetsTotal;
-                
-                projections.push({
-                    month: projDate.toLocaleDateString('en-AU', { month: 'short', year: 'numeric' }),
-                    cash: Math.round(runningCash),
-                    investments: Math.round(runningInvestments),
-                    total: Math.round(totalWealth),
-                    availableForHouse: Math.round(runningCash + runningInvestments * 0.9)
-                });
-            }
-            
-            return projections;
-        }
-
-        function updateProjections() {
-            appData.projectionMonths = parseInt(document.getElementById('projection-months').value);
-            saveData();
-            
-            const projections = calculateProjections();
-            const tableBody = document.getElementById('projections-table');
-            
-            if (projections.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-slate-500">Add your financial data to see projections</td></tr>';
-                return;
-            }
-            
-            tableBody.innerHTML = projections.slice(0, 12).map(proj => `
-                <tr class="border-b border-slate-100">
-                    <td class="py-2 text-sm text-slate-600">${proj.month}</td>
-                    <td class="py-2 text-sm text-slate-800 text-right">${proj.cash.toLocaleString()}</td>
-                    <td class="py-2 text-sm text-slate-800 text-right">${proj.investments.toLocaleString()}</td>
-                    <td class="py-2 text-sm font-semibold text-slate-800 text-right">${proj.total.toLocaleString()}</td>
-                    <td class="py-2 text-sm font-semibold text-orange-600 text-right">${proj.availableForHouse.toLocaleString()}</td>
-                </tr>
-            `).join('');
-        }
-
-        function updateDashboard() {
-            // Calculate totals
-            const accountsTotal = Object.values(appData.accounts).reduce((sum, acc) => sum + acc.balance, 0);
-            const tempAssetsTotal = appData.temporaryAssets.reduce((sum, asset) => sum + asset.amount, 0);
-            const totalNetWorth = accountsTotal + tempAssetsTotal;
-            const liquidCash = appData.accounts.upBank.balance;
-            const investments = accountsTotal - liquidCash;
-            
-            // Update dashboard metrics
-            document.getElementById('total-net-worth').textContent = `${totalNetWorth.toLocaleString()}`;
-            document.getElementById('liquid-cash').textContent = `${liquidCash.toLocaleString()}`;
-            document.getElementById('investments').textContent = `${investments.toLocaleString()}`;
-            
-            // Calculate current month flow
-            const monthlyExpenseTotal = Object.values(appData.expenses).reduce((sum, exp) => sum + exp, 0);
-            const currentMonth = new Date().toISOString().slice(0, 7);
-            const monthScenarios = appData.scenarios.filter(s => 
-                s.enabled && s.date.startsWith(currentMonth)
-            ).reduce((sum, s) => sum + s.amount, 0);
-            
-            const netFlow = appData.income.monthlySalary - monthlyExpenseTotal + monthScenarios;
-            
-            document.getElementById('month-income').textContent = `+${appData.income.monthlySalary.toLocaleString()}`;
-            document.getElementById('month-expenses').textContent = `-${monthlyExpenseTotal.toLocaleString()}`;
-            
-            const scenarioEl = document.getElementById('month-scenarios');
-            scenarioEl.textContent = `${monthScenarios >= 0 ? '+' : ''}${monthScenarios.toLocaleString()}`;
-            scenarioEl.className = `text-xl font-bold ${monthScenarios >= 0 ? 'text-green-600' : 'text-red-600'}`;
-            
-            const netEl = document.getElementById('month-net');
-            netEl.textContent = `${netFlow >= 0 ? '+' : ''}${netFlow.toLocaleString()}`;
-            netEl.className = `text-xl font-bold ${netFlow >= 0 ? 'text-green-600' : 'text-red-600'}`;
-            
-            // Calculate and update projections
-            const projections = calculateProjections();
-            
-            document.getElementById('available-house').textContent = `${(projections[0]?.availableForHouse || 0).toLocaleString()}`;
-            document.getElementById('house-6m').textContent = `${(projections[6]?.availableForHouse || 0).toLocaleString()}`;
-            document.getElementById('house-12m').textContent = `${(projections[12]?.availableForHouse || 0).toLocaleString()}`;
-            document.getElementById('house-18m').textContent = `${(projections[18]?.availableForHouse || 0).toLocaleString()}`;
-            
-            // Update projections table if on that tab
-            if (!document.getElementById('content-projections').classList.contains('hidden')) {
-                updateProjections();
-            }
-        }
-
-        function populateFields() {
-            // Populate account fields
-            Object.keys(appData.accounts).forEach(key => {
-                const input = document.getElementById(`account-${key}`);
-                const dateEl = document.getElementById(`date-${key}`);
-                if (input) {
-                    input.value = appData.accounts[key].balance;
-                    dateEl.textContent = `Updated: ${appData.accounts[key].lastUpdated}`;
-                }
-            });
-            
-            // Populate income fields
-            document.getElementById('monthly-salary').value = appData.income.monthlySalary;
-            document.getElementById('annual-bonus').value = appData.income.annualBonus.amount;
-            document.getElementById('bonus-confirmed').value = appData.income.annualBonus.confirmed;
-            
-            // Populate expense fields
-            Object.keys(appData.expenses).forEach(key => {
-                const input = document.getElementById(`expense-${key}`);
-                if (input) input.value = appData.expenses[key];
-            });
-            
-            // Update totals
-            updateExpenses();
-            
-            // Populate projection settings
-            document.getElementById('projection-months').value = appData.projectionMonths;
-        }
-
-        // Initialize app
-        function initApp() {
-            loadData();
-            populateFields();
-            renderTemporaryAssets();
-            renderScenarios();
-            updateDashboard();
-            console.log('Finance Tracker loaded successfully!');
-        }
-
-        // Start the app when page loads
-        document.addEventListener('DOMContentLoaded', initApp);
-    </script>
+// Auto-save on window close
+window.addEventListener('beforeunload', saveData);
+</script>
 </body>
 </html>
