@@ -26,21 +26,21 @@
 
             <!-- Navigation -->
             <div class="flex flex-wrap space-x-1 mb-6 bg-white rounded-lg p-1 shadow-sm">
-                <button onclick="showTab('dashboard')" id="tab-dashboard" class="tab-btn flex items-center space-x-2 px-4 py-2 rounded-md transition-all bg-blue-500 text-white shadow-sm">
+                <button onclick="window.showTab('dashboard')" id="tab-dashboard" class="tab-btn flex items-center space-x-2 px-4 py-2 rounded-md transition-all bg-blue-500 text-white shadow-sm">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="22,7 13.5,15.5 8.5,10.5 2,17"></polyline>
                         <polyline points="16,7 22,7 22,13"></polyline>
                     </svg>
                     <span>Dashboard</span>
                 </button>
-                <button onclick="showTab('accounts')" id="tab-accounts" class="tab-btn flex items-center space-x-2 px-4 py-2 rounded-md transition-all text-slate-600 hover:bg-slate-100">
+                <button onclick="window.showTab('accounts')" id="tab-accounts" class="tab-btn flex items-center space-x-2 px-4 py-2 rounded-md transition-all text-slate-600 hover:bg-slate-100">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="12" y1="1" x2="12" y2="23"></line>
                         <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
                     </svg>
                     <span>Accounts</span>
                 </button>
-                <button onclick="showTab('planning')" id="tab-planning" class="tab-btn flex items-center space-x-2 px-4 py-2 rounded-md transition-all text-slate-600 hover:bg-slate-100">
+                <button onclick="window.showTab('planning')" id="tab-planning" class="tab-btn flex items-center space-x-2 px-4 py-2 rounded-md transition-all text-slate-600 hover:bg-slate-100">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                         <line x1="16" y1="2" x2="16" y2="6"></line>
@@ -49,14 +49,14 @@
                     </svg>
                     <span>Planning</span>
                 </button>
-                <button onclick="showTab('adjustments')" id="tab-adjustments" class="tab-btn flex items-center space-x-2 px-4 py-2 rounded-md transition-all text-slate-600 hover:bg-slate-100">
+                <button onclick="window.showTab('adjustments')" id="tab-adjustments" class="tab-btn flex items-center space-x-2 px-4 py-2 rounded-md transition-all text-slate-600 hover:bg-slate-100">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="3"></circle>
                         <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
                     </svg>
                     <span>Adjustments</span>
                 </button>
-                <button onclick="showTab('projections')" id="tab-projections" class="tab-btn flex items-center space-x-2 px-4 py-2 rounded-md transition-all text-slate-600 hover:bg-slate-100">
+                <button onclick="window.showTab('projections')" id="tab-projections" class="tab-btn flex items-center space-x-2 px-4 py-2 rounded-md transition-all text-slate-600 hover:bg-slate-100">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="22,7 13.5,15.5 8.5,10.5 2,17"></polyline>
                         <polyline points="16,7 22,7 22,13"></polyline>
@@ -76,13 +76,13 @@
                                 <p class="text-xs text-amber-600 mt-1" id="sync-status">Local storage only - Google Drive not connected</p>
                             </div>
                             <div class="flex space-x-2">
-                                <button onclick="exportData()" class="px-3 py-2 bg-amber-500 text-white rounded-md hover:bg-amber-600 text-sm">
+                                <button onclick="window.exportData()" class="px-3 py-2 bg-amber-500 text-white rounded-md hover:bg-amber-600 text-sm">
                                     Export Data
                                 </button>
-                                <button onclick="importData()" class="px-3 py-2 bg-amber-500 text-white rounded-md hover:bg-amber-600 text-sm">
+                                <button onclick="window.importData()" class="px-3 py-2 bg-amber-500 text-white rounded-md hover:bg-amber-600 text-sm">
                                     Import Data
                                 </button>
-                                <button onclick="toggleGoogleDrive()" id="google-drive-btn" class="px-3 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 text-sm flex items-center space-x-1">
+                                <button onclick="window.toggleGoogleDrive()" id="google-drive-btn" class="px-3 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 text-sm flex items-center space-x-1">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                                         <path d="M8.5 7L15 17h6l-6.5-10zm-1.3 0L1 17h6.5L11 11zm7.3 11L11 12 7.5 18z"/>
                                     </svg>
@@ -152,7 +152,7 @@
                         <h3 class="text-lg font-semibold text-slate-800 mb-4">Net Worth Projection</h3>
                         <div class="flex items-center space-x-4 mb-4">
                             <label class="text-sm font-medium text-slate-700">Select Future Date:</label>
-                            <input type="date" id="projection-date" onchange="updateSelectedDateProjection()" class="px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500">
+                            <input type="date" id="projection-date" onchange="window.updateSelectedDateProjection()" class="px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500">
                         </div>
                         
                         <div id="selected-date-projection" class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -182,7 +182,7 @@
                     <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
                         <div class="flex justify-between items-center mb-6">
                             <h3 class="text-lg font-semibold text-slate-800">Account Balances</h3>
-                            <button onclick="refreshAllBalances()" class="flex items-center space-x-2 px-3 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors">
+                            <button onclick="window.refreshAllBalances()" class="flex items-center space-x-2 px-3 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <polyline points="1 4 1 10 7 10"></polyline>
                                     <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
@@ -198,7 +198,7 @@
                                 <div class="space-y-2">
                                     <label class="block text-sm font-medium text-slate-700">Up Bank (Cash)</label>
                                     <div class="flex space-x-2">
-                                        <input type="text" id="account-upBank" onchange="updateAccount('upBank', 'balance', this.value)" class="flex-1 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="$0">
+                                        <input type="text" id="account-upBank" onchange="window.updateAccount('upBank', 'balance', this.value)" class="flex-1 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="$0">
                                         <span id="date-upBank" class="px-3 py-2 text-sm text-slate-500 bg-slate-50 rounded-md">Updated: 2025-07-25</span>
                                     </div>
                                 </div>
@@ -211,7 +211,7 @@
                                     <div class="space-y-2">
                                         <label class="block text-sm font-medium text-slate-700">CommBank Pocket (ETFs)</label>
                                         <div class="flex space-x-2">
-                                            <input type="text" id="account-commBankPocket" onchange="updateAccount('commBankPocket', 'balance', this.value)" class="flex-1 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="$0">
+                                            <input type="text" id="account-commBankPocket" onchange="window.updateAccount('commBankPocket', 'balance', this.value)" class="flex-1 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="$0">
                                             <span id="date-commBankPocket" class="px-3 py-2 text-sm text-slate-500 bg-slate-50 rounded-md">Updated: 2025-07-24</span>
                                         </div>
                                     </div>
@@ -219,7 +219,7 @@
                                     <div class="space-y-2">
                                         <label class="block text-sm font-medium text-slate-700">CommSec (Shares)</label>
                                         <div class="flex space-x-2">
-                                            <input type="text" id="account-commsec" onchange="updateAccount('commsec', 'balance', this.value)" class="flex-1 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="$0">
+                                            <input type="text" id="account-commsec" onchange="window.updateAccount('commsec', 'balance', this.value)" class="flex-1 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="$0">
                                             <span id="date-commsec" class="px-3 py-2 text-sm text-slate-500 bg-slate-50 rounded-md">Updated: 2025-07-23</span>
                                         </div>
                                     </div>
@@ -227,7 +227,7 @@
                                     <div class="space-y-2">
                                         <label class="block text-sm font-medium text-slate-700">CDIA (Cash)</label>
                                         <div class="flex space-x-2">
-                                            <input type="text" id="account-commBankCDIA" onchange="updateAccount('commBankCDIA', 'balance', this.value)" class="flex-1 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="$0">
+                                            <input type="text" id="account-commBankCDIA" onchange="window.updateAccount('commBankCDIA', 'balance', this.value)" class="flex-1 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="$0">
                                             <span id="date-commBankCDIA" class="px-3 py-2 text-sm text-slate-500 bg-slate-50 rounded-md">Updated: 2025-08-04</span>
                                         </div>
                                     </div>
@@ -244,13 +244,13 @@
                                         <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
                                             <div>
                                                 <label class="block text-xs text-slate-500 mb-1">USD Amount</label>
-                                                <input type="text" id="account-stakeUSD-USD" onchange="updateAccount('stakeUSD', 'balanceUSD', this.value)" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500" placeholder="$0">
+                                                <input type="text" id="account-stakeUSD-USD" onchange="window.updateAccount('stakeUSD', 'balanceUSD', this.value)" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500" placeholder="$0">
                                             </div>
                                             <div>
                                                 <label class="block text-xs text-slate-500 mb-1">AUD Amount (Rate: <span id="exchange-rate-etf">1.6</span>)</label>
                                                 <div class="flex space-x-2">
                                                     <input type="text" id="account-stakeUSD-AUD" readonly class="flex-1 px-3 py-2 border border-slate-300 rounded-md bg-slate-50">
-                                                    <button onclick="convertUSDToAUD('stakeUSD')" id="convert-btn-etf" class="px-3 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:opacity-50 flex items-center" title="Get live exchange rate">
+                                                    <button onclick="window.convertUSDToAUD('stakeUSD')" id="convert-btn-etf" class="px-3 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:opacity-50 flex items-center" title="Get live exchange rate">
                                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                                             <polyline points="1 4 1 10 7 10"></polyline>
                                                             <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
@@ -270,13 +270,13 @@
                                         <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
                                             <div>
                                                 <label class="block text-xs text-slate-500 mb-1">USD Amount</label>
-                                                <input type="text" id="account-stakeUSDCash-USD" onchange="updateAccount('stakeUSDCash', 'balanceUSD', this.value)" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500" placeholder="$0">
+                                                <input type="text" id="account-stakeUSDCash-USD" onchange="window.updateAccount('stakeUSDCash', 'balanceUSD', this.value)" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500" placeholder="$0">
                                             </div>
                                             <div>
                                                 <label class="block text-xs text-slate-500 mb-1">AUD Amount (Rate: <span id="exchange-rate-cash">1.6</span>)</label>
                                                 <div class="flex space-x-2">
                                                     <input type="text" id="account-stakeUSDCash-AUD" readonly class="flex-1 px-3 py-2 border border-slate-300 rounded-md bg-slate-50">
-                                                    <button onclick="convertUSDToAUD('stakeUSDCash')" id="convert-btn-cash" class="px-3 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:opacity-50 flex items-center" title="Get live exchange rate">
+                                                    <button onclick="window.convertUSDToAUD('stakeUSDCash')" id="convert-btn-cash" class="px-3 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:opacity-50 flex items-center" title="Get live exchange rate">
                                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                                             <polyline points="1 4 1 10 7 10"></polyline>
                                                             <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
@@ -294,7 +294,7 @@
                                     <div class="space-y-2">
                                         <label class="block text-sm font-medium text-slate-700">Stake (AUD Cash)</label>
                                         <div class="flex space-x-2">
-                                            <input type="text" id="account-stakeAUDCash" onchange="updateAccount('stakeAUDCash', 'balance', this.value)" class="flex-1 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="$0">
+                                            <input type="text" id="account-stakeAUDCash" onchange="window.updateAccount('stakeAUDCash', 'balance', this.value)" class="flex-1 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="$0">
                                             <span id="date-stakeAUDCash" class="px-3 py-2 text-sm text-slate-500 bg-slate-50 rounded-md">Updated: 2025-08-04</span>
                                         </div>
                                     </div>
@@ -326,7 +326,7 @@
                     <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="text-lg font-semibold text-slate-800">Other Assets</h3>
-                            <button onclick="addTemporaryAsset()" class="flex items-center space-x-2 px-3 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors">
+                            <button onclick="window.addTemporaryAsset()" class="flex items-center space-x-2 px-3 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <line x1="12" y1="5" x2="12" y2="19"></line>
                                     <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -351,13 +351,13 @@
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-2">Annual salary (exc. super)</label>
-                                <input type="text" id="base-salary" onchange="updateBaseSalary(this.value)" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500">
+                                <input type="text" id="base-salary" onchange="window.updateBaseSalary(this.value)" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-2">Monthly take-home pay</label>
                                 <div class="flex space-x-2">
                                     <input type="text" id="monthly-after-tax" readonly class="flex-1 px-3 py-2 border border-slate-300 rounded-md bg-slate-50">
-                                    <button onclick="calculateIncome()" class="px-3 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 flex items-center" title="Calculate with Australian tax rates">
+                                    <button onclick="window.calculateIncome()" class="px-3 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 flex items-center" title="Calculate with Australian tax rates">
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                             <polyline points="1 4 1 10 7 10"></polyline>
                                             <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
@@ -367,7 +367,7 @@
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-2">Pay Date (Day of Month)</label>
-                                <select id="pay-date" onchange="updatePayDate(this.value)" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500">
+                                <select id="pay-date" onchange="window.updatePayDate(this.value)" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500">
                                     <!-- Will be populated by JS -->
                                 </select>
                             </div>
@@ -381,7 +381,7 @@
                     <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="text-lg font-semibold text-slate-800">Future Income Changes</h3>
-                            <button onclick="addIncomeChange()" class="flex items-center space-x-2 px-3 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors">
+                            <button onclick="window.addIncomeChange()" class="flex items-center space-x-2 px-3 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <line x1="12" y1="5" x2="12" y2="19"></line>
                                     <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -401,19 +401,19 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-2">High Scenario (%)</label>
-                                <input type="number" id="high-scenario" onchange="updateInvestmentScenarios()" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500" step="0.1" value="10">
+                                <input type="number" id="high-scenario" onchange="window.updateInvestmentScenarios()" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500" step="0.1" value="10">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-2">Low Scenario (%)</label>
-                                <input type="number" id="low-scenario" onchange="updateInvestmentScenarios()" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500" step="0.1" value="-10">
+                                <input type="number" id="low-scenario" onchange="window.updateInvestmentScenarios()" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500" step="0.1" value="-10">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-2">Cash Buffer</label>
-                                <input type="text" id="cash-buffer" onchange="updateInvestmentScenarios()" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500">
+                                <input type="text" id="cash-buffer" onchange="window.updateInvestmentScenarios()" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-2">Investment Ratio (%)</label>
-                                <input type="number" id="investment-ratio" onchange="updateInvestmentScenarios()" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500" step="1" min="0" max="100" value="80">
+                                <input type="number" id="investment-ratio" onchange="window.updateInvestmentScenarios()" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500" step="1" min="0" max="100" value="80">
                             </div>
                         </div>
                         <p class="text-sm text-slate-600 mt-3">Excess cash above the buffer amount will be invested at the specified ratio (e.g., 80% invested, 20% kept as additional cash).</p>
@@ -425,27 +425,27 @@
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-2">Rent</label>
-                                <input type="text" id="expense-rent" onchange="updateMonthlyExpenses()" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500">
+                                <input type="text" id="expense-rent" onchange="window.updateMonthlyExpenses()" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-2">Utilities</label>
-                                <input type="text" id="expense-utilities" onchange="updateMonthlyExpenses()" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500">
+                                <input type="text" id="expense-utilities" onchange="window.updateMonthlyExpenses()" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-2">Groceries</label>
-                                <input type="text" id="expense-groceries" onchange="updateMonthlyExpenses()" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500">
+                                <input type="text" id="expense-groceries" onchange="window.updateMonthlyExpenses()" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-2">Transport</label>
-                                <input type="text" id="expense-transport" onchange="updateMonthlyExpenses()" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500">
+                                <input type="text" id="expense-transport" onchange="window.updateMonthlyExpenses()" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-2">Entertainment</label>
-                                <input type="text" id="expense-entertainment" onchange="updateMonthlyExpenses()" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500">
+                                <input type="text" id="expense-entertainment" onchange="window.updateMonthlyExpenses()" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-2">Other</label>
-                                <input type="text" id="expense-other" onchange="updateMonthlyExpenses()" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500">
+                                <input type="text" id="expense-other" onchange="window.updateMonthlyExpenses()" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500">
                             </div>
                         </div>
                         <div class="mt-4 p-3 bg-slate-50 rounded-lg">
@@ -460,7 +460,7 @@
                 <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="text-lg font-semibold text-slate-800">Additional Financial Adjustments</h3>
-                        <button onclick="addAdjustment()" class="flex items-center space-x-2 px-3 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors">
+                        <button onclick="window.addAdjustment()" class="flex items-center space-x-2 px-3 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <line x1="12" y1="5" x2="12" y2="19"></line>
                                 <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -484,7 +484,7 @@
                             <h3 class="text-lg font-semibold text-slate-800">Projection Settings</h3>
                             <div class="flex items-center space-x-2">
                                 <label class="text-sm font-medium text-slate-700">Months to project:</label>
-                                <select id="projection-months" onchange="updateProjectionMonths(this.value)" class="px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500">
+                                <select id="projection-months" onchange="window.updateProjectionMonths(this.value)" class="px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500">
                                     <option value="6">6 months</option>
                                     <option value="12" selected>12 months</option>
                                     <option value="18">18 months</option>
@@ -1036,10 +1036,10 @@ function renderTemporaryAssets() {
     appState.temporaryAssets.forEach(asset => {
         html += `
         <div class="flex flex-wrap space-x-3 items-center p-3 bg-slate-50 rounded-lg gap-2">
-            <input type="text" value="${asset.description}" onchange="updateTemporaryAsset(${asset.id}, 'description', this.value)" class="flex-1 min-w-48 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500" placeholder="Description">
-            <input type="text" value="${formatCurrency(asset.amount)}" onchange="updateTemporaryAsset(${asset.id}, 'amount', this.value)" class="w-32 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500" placeholder="$0">
-            <input type="date" value="${asset.returnDate}" onchange="updateTemporaryAsset(${asset.id}, 'returnDate', this.value)" class="w-40 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500">
-            <button onclick="deleteTemporaryAsset(${asset.id})" class="p-2 text-red-500 hover:bg-red-50 rounded-md">
+            <input type="text" value="${asset.description}" onchange="window.updateTemporaryAsset(${asset.id}, 'description', this.value)" class="flex-1 min-w-48 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500" placeholder="Description">
+            <input type="text" value="${formatCurrency(asset.amount)}" onchange="window.updateTemporaryAsset(${asset.id}, 'amount', this.value)" class="w-32 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500" placeholder="$0">
+            <input type="date" value="${asset.returnDate}" onchange="window.updateTemporaryAsset(${asset.id}, 'returnDate', this.value)" class="w-40 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500">
+            <button onclick="window.deleteTemporaryAsset(${asset.id})" class="p-2 text-red-500 hover:bg-red-50 rounded-md">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="3,6 5,6 21,6"></polyline>
                     <path d="M19,6V20a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6M8,6V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2V6"></path>
@@ -1067,13 +1067,13 @@ function renderIncomeChanges() {
         
         html += `
         <div class="flex flex-wrap space-x-3 items-center p-3 bg-slate-50 rounded-lg gap-2">
-            <button onclick="updateIncomeChange(${incomeChange.id}, 'enabled', ${!incomeChange.enabled})" class="p-2 rounded-md ${incomeChange.enabled ? 'text-green-600 bg-green-50' : 'text-slate-400 bg-slate-100'}">
+            <button onclick="window.updateIncomeChange(${incomeChange.id}, 'enabled', ${!incomeChange.enabled})" class="p-2 rounded-md ${incomeChange.enabled ? 'text-green-600 bg-green-50' : 'text-slate-400 bg-slate-100'}">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${eyeIcon}</svg>
             </button>
-            <input type="text" value="${incomeChange.description}" onchange="updateIncomeChange(${incomeChange.id}, 'description', this.value)" class="flex-1 min-w-48 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500" placeholder="Description (e.g., Promotion, New job)">
-            <input type="text" value="${formatCurrency(incomeChange.newSalary)}" onchange="updateIncomeChange(${incomeChange.id}, 'newSalary', this.value)" class="w-40 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500" placeholder="New annual salary">
-            <input type="date" value="${incomeChange.effectiveDate}" onchange="updateIncomeChange(${incomeChange.id}, 'effectiveDate', this.value)" class="w-40 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500">
-            <button onclick="deleteIncomeChange(${incomeChange.id})" class="p-2 text-red-500 hover:bg-red-50 rounded-md">
+            <input type="text" value="${incomeChange.description}" onchange="window.updateIncomeChange(${incomeChange.id}, 'description', this.value)" class="flex-1 min-w-48 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500" placeholder="Description (e.g., Promotion, New job)">
+            <input type="text" value="${formatCurrency(incomeChange.newSalary)}" onchange="window.updateIncomeChange(${incomeChange.id}, 'newSalary', this.value)" class="w-40 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500" placeholder="New annual salary">
+            <input type="date" value="${incomeChange.effectiveDate}" onchange="window.updateIncomeChange(${incomeChange.id}, 'effectiveDate', this.value)" class="w-40 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500">
+            <button onclick="window.deleteIncomeChange(${incomeChange.id})" class="p-2 text-red-500 hover:bg-red-50 rounded-md">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="3,6 5,6 21,6"></polyline>
                     <path d="M19,6V20a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6M8,6V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2V6"></path>
@@ -1101,17 +1101,17 @@ function renderAdjustments() {
         
         html += `
         <div class="flex flex-wrap space-x-3 items-center p-3 bg-slate-50 rounded-lg gap-2">
-            <button onclick="updateAdjustment(${adjustment.id}, 'enabled', ${!adjustment.enabled})" class="p-2 rounded-md ${adjustment.enabled ? 'text-green-600 bg-green-50' : 'text-slate-400 bg-slate-100'}">
+            <button onclick="window.updateAdjustment(${adjustment.id}, 'enabled', ${!adjustment.enabled})" class="p-2 rounded-md ${adjustment.enabled ? 'text-green-600 bg-green-50' : 'text-slate-400 bg-slate-100'}">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${eyeIcon}</svg>
             </button>
-            <select onchange="updateAdjustment(${adjustment.id}, 'type', this.value)" class="w-32 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 text-sm">
+            <select onchange="window.updateAdjustment(${adjustment.id}, 'type', this.value)" class="w-32 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 text-sm">
                 <option value="income" ${adjustment.type === 'income' ? 'selected' : ''}>Income</option>
                 <option value="expense" ${adjustment.type === 'expense' ? 'selected' : ''}>Expense</option>
             </select>
-            <input type="text" value="${adjustment.description}" onchange="updateAdjustment(${adjustment.id}, 'description', this.value)" class="flex-1 min-w-48 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500" placeholder="Description">
-            <input type="text" value="${formatCurrency(adjustment.amount)}" onchange="updateAdjustment(${adjustment.id}, 'amount', this.value)" class="w-32 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500" placeholder="$0">
-            <input type="date" value="${adjustment.date}" onchange="updateAdjustment(${adjustment.id}, 'date', this.value)" class="w-40 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500">
-            <button onclick="deleteAdjustment(${adjustment.id})" class="p-2 text-red-500 hover:bg-red-50 rounded-md">
+            <input type="text" value="${adjustment.description}" onchange="window.updateAdjustment(${adjustment.id}, 'description', this.value)" class="flex-1 min-w-48 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500" placeholder="Description">
+            <input type="text" value="${formatCurrency(adjustment.amount)}" onchange="window.updateAdjustment(${adjustment.id}, 'amount', this.value)" class="w-32 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500" placeholder="$0">
+            <input type="date" value="${adjustment.date}" onchange="window.updateAdjustment(${adjustment.id}, 'date', this.value)" class="w-40 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500">
+            <button onclick="window.deleteAdjustment(${adjustment.id})" class="p-2 text-red-500 hover:bg-red-50 rounded-md">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="3,6 5,6 21,6"></polyline>
                     <path d="M19,6V20a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6M8,6V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2V6"></path>
@@ -1664,6 +1664,31 @@ function importData() {
     input.click();
 }
 
+// Make functions globally accessible
+window.showTab = showTab;
+window.updateAccount = updateAccount;
+window.refreshAllBalances = refreshAllBalances;
+window.updateBaseSalary = updateBaseSalary;
+window.calculateIncome = calculateIncome;
+window.updatePayDate = updatePayDate;
+window.addIncomeChange = addIncomeChange;
+window.updateIncomeChange = updateIncomeChange;
+window.deleteIncomeChange = deleteIncomeChange;
+window.updateMonthlyExpenses = updateMonthlyExpenses;
+window.addAdjustment = addAdjustment;
+window.updateAdjustment = updateAdjustment;
+window.deleteAdjustment = deleteAdjustment;
+window.addTemporaryAsset = addTemporaryAsset;
+window.updateTemporaryAsset = updateTemporaryAsset;
+window.deleteTemporaryAsset = deleteTemporaryAsset;
+window.updateInvestmentScenarios = updateInvestmentScenarios;
+window.updateProjectionMonths = updateProjectionMonths;
+window.updateSelectedDateProjection = updateSelectedDateProjection;
+window.convertUSDToAUD = convertUSDToAUD;
+window.toggleGoogleDrive = toggleGoogleDrive;
+window.exportData = exportData;
+window.importData = importData;
+
 // Initialization
 function initializeApp() {
     loadData();
@@ -1701,6 +1726,3 @@ function initializeApp() {
 // Event Listeners
 document.addEventListener('DOMContentLoaded', initializeApp);
 window.addEventListener('beforeunload', saveData);
-</script>
-</body>
-</html>
