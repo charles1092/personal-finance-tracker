@@ -313,7 +313,11 @@ function saveData() {
         localStorage.setItem('advancedFinanceTracker', JSON.stringify(appState));
         
         if (googleDriveConnected && accessToken) {
-            saveToGoogleDrive();
+            saveToGoogleDrive().then(() => {
+                console.log('Data auto-synced to Google Drive');
+            }).catch(error => {
+                console.error('Auto-sync failed:', error);
+            });
         }
     } catch (e) {
         console.error('Failed to save data:', e);
@@ -384,6 +388,7 @@ function importData() {
 
 // Google Drive Functions
 async function initializeGapiClient() {
+    console.log('Initializing Google API client...');
     try {
         await gapi.client.init({
             apiKey: GOOGLE_API_KEY,
@@ -391,39 +396,68 @@ async function initializeGapiClient() {
         });
         gapiInited = true;
         maybeEnableButtons();
-        console.log('Google API client initialized');
+        console.log('✅ Google API client initialized successfully');
     } catch (error) {
-        console.error('Error initializing GAPI client:', error);
+        console.error('❌ Error initializing GAPI client:', error);
+        console.log('This might be due to:');
+        console.log('1. Network connectivity issues');
+        console.log('2. Invalid API key');
+        console.log('3. CORS restrictions');
     }
 }
 
 function gisLoaded() {
-    tokenClient = google.accounts.oauth2.initTokenClient({
-        client_id: GOOGLE_CLIENT_ID,
-        scope: SCOPES,
-        callback: async (resp) => {
-            if (resp.error !== undefined) {
-                throw (resp);
-            }
-            accessToken = resp.access_token;
-            googleDriveConnected = true;
-            updateSyncStatus();
-            await loadFromGoogleDrive();
-        },
-    });
-    gisInited = true;
-    maybeEnableButtons();
-    console.log('Google Identity Services loaded');
+    console.log('Initializing Google Identity Services...');
+    try {
+        tokenClient = google.accounts.oauth2.initTokenClient({
+            client_id: GOOGLE_CLIENT_ID,
+            scope: SCOPES,
+            callback: async (resp) => {
+                console.log('OAuth callback received:', resp);
+                if (resp.error !== undefined) {
+                    console.error('OAuth error:', resp.error);
+                    throw (resp);
+                }
+                accessToken = resp.access_token;
+                googleDriveConnected = true;
+                updateSyncStatus();
+                await loadFromGoogleDrive();
+            },
+        });
+        gisInited = true;
+        maybeEnableButtons();
+        console.log('✅ Google Identity Services initialized successfully');
+    } catch (error) {
+        console.error('❌ Error initializing Google Identity Services:', error);
+    }
 }
 
 function maybeEnableButtons() {
+    console.log('Checking if buttons should be enabled...');
+    console.log('gapiInited:', gapiInited, 'gisInited:', gisInited);
+    
     if (gapiInited && gisInited) {
         document.getElementById('google-drive-btn').disabled = false;
-        console.log('Google Drive button enabled');
+        console.log('✅ Google Drive button enabled');
+    } else {
+        console.log('⏳ Waiting for Google APIs to initialize...');
     }
 }
 
 function toggleGoogleDrive() {
+    console.log('toggleGoogleDrive called');
+    console.log('googleDriveConnected:', googleDriveConnected);
+    console.log('gapiInited:', gapiInited);
+    console.log('gisInited:', gisInited);
+    console.log('tokenClient:', !!tokenClient);
+    
+    // Debug mode if APIs not loaded
+    if (!gapiInited || !gisInited || !tokenClient) {
+        console.log('⚠️ Google APIs not properly loaded');
+        alert('Google Drive APIs are not loaded properly. Check console for details.\n\nThis might be because:\n1. The page needs to be served over HTTPS\n2. Google APIs are blocked\n3. Network connectivity issues');
+        return;
+    }
+    
     if (googleDriveConnected) {
         // Disconnect
         if (accessToken) {
@@ -436,6 +470,7 @@ function toggleGoogleDrive() {
         updateSyncStatus();
     } else {
         // Connect
+        console.log('Requesting access token...');
         tokenClient.requestAccessToken({prompt: 'consent'});
     }
 }
@@ -564,6 +599,11 @@ function updateSyncStatus(status = 'connected') {
     const statusElement = document.getElementById('sync-status');
     const btnText = document.getElementById('google-drive-btn-text');
     
+    if (!btnText) {
+        console.log('Button text element not found');
+        return;
+    }
+    
     if (googleDriveConnected) {
         if (status === 'synced') {
             statusElement.textContent = 'Synced with Google Drive ✓';
@@ -595,6 +635,27 @@ window.importData = importData;
 window.toggleGoogleDrive = toggleGoogleDrive;
 
 console.log('Core functions loaded and exposed globally');
+
+// Add simple test function for debugging
+window.testGoogleConnection = function() {
+    console.log('=== GOOGLE DRIVE DEBUG INFO ===');
+    console.log('gapi available:', typeof gapi !== 'undefined');
+    console.log('google available:', typeof google !== 'undefined');
+    console.log('google.accounts available:', typeof google !== 'undefined' && google.accounts);
+    console.log('gapiInited:', gapiInited);
+    console.log('gisInited:', gisInited);
+    console.log('googleDriveConnected:', googleDriveConnected);
+    console.log('tokenClient:', !!tokenClient);
+    console.log('accessToken:', !!accessToken);
+    console.log('Button disabled:', document.getElementById('google-drive-btn').disabled);
+    console.log('=== END DEBUG INFO ===');
+};
+
+// Test on load
+setTimeout(() => {
+    console.log('Running automatic Google API test...');
+    window.testGoogleConnection();
+}, 2000);
 </script>
 
     <div class="p-4">
@@ -663,11 +724,11 @@ console.log('Core functions loaded and exposed globally');
                                 <button onclick="importData()" class="px-3 py-2 bg-amber-500 text-white rounded-md hover:bg-amber-600 text-sm">
                                     Import Data
                                 </button>
-                                <button onclick="toggleGoogleDrive()" id="google-drive-btn" class="px-3 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 text-sm flex items-center space-x-1">
+                                <button onclick="toggleGoogleDrive()" id="google-drive-btn" disabled class="px-3 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:opacity-50 text-sm flex items-center space-x-1">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                                         <path d="M8.5 7L15 17h6l-6.5-10zm-1.3 0L1 17h6.5L11 11zm7.3 11L11 12 7.5 18z"/>
                                     </svg>
-                                    <span id="google-drive-btn-text">Connect Google Drive</span>
+                                    <span id="google-drive-btn-text">Loading...</span>
                                 </button>
                             </div>
                         </div>
@@ -1062,12 +1123,54 @@ function initializeApp() {
     
     loadData();
     
+    // Debug Google API loading
+    console.log('Checking Google APIs...');
+    console.log('gapi available:', typeof gapi !== 'undefined');
+    console.log('google available:', typeof google !== 'undefined');
+    console.log('google.accounts available:', typeof google !== 'undefined' && google.accounts);
+    
+    // Initialize Google APIs
+    if (typeof gapi !== 'undefined') {
+        console.log('Loading Google API client...');
+        gapi.load('client', initializeGapiClient);
+    } else {
+        console.log('❌ Google API (gapi) not loaded - check if https://apis.google.com/js/api.js loaded');
+        // Enable button with debug mode after a delay
+        setTimeout(() => {
+            const btn = document.getElementById('google-drive-btn');
+            const btnText = document.getElementById('google-drive-btn-text');
+            if (btn && btnText) {
+                btn.disabled = false;
+                btnText.textContent = 'Google APIs Failed';
+                console.log('Google Drive button enabled in debug mode');
+            }
+        }, 2000);
+    }
+    
+    if (typeof google !== 'undefined' && google.accounts) {
+        console.log('Loading Google Identity Services...');
+        gisLoaded();
+    } else {
+        console.log('❌ Google Identity Services not loaded - check if https://accounts.google.com/gsi/client loaded');
+        // Enable button with debug mode after a delay
+        setTimeout(() => {
+            const btn = document.getElementById('google-drive-btn');
+            const btnText = document.getElementById('google-drive-btn-text');
+            if (btn && btnText && btn.disabled) {
+                btn.disabled = false;
+                btnText.textContent = 'Google APIs Failed';
+                console.log('Google Drive button enabled in debug mode (GIS failed)');
+            }
+        }, 2000);
+    }
+    
     if (!appState.lastSyncTime) {
         appState.lastSyncTime = Date.now();
     }
     
     updateAccountsDisplay();
     updatePlanningDisplay();
+    updateSyncStatus(); // Set initial Google Drive button state
     
     if (appState.income.baseSalary > 0 && !appState.income.isCalculated) {
         calculateIncome();
