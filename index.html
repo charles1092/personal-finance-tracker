@@ -564,7 +564,7 @@ let gapiInited = false;
 let gisInited = false;
 let accessToken = null;
 
-// Global application state - updated with new accounts
+// Global application state
 let appState = {
     accounts: {
         upBank: { balance: 8500, lastUpdated: '4 Aug 2025' },
@@ -628,7 +628,7 @@ function parseCurrency(value) {
     return parseFloat(value) || 0;
 }
 
-// Australian Tax Calculation - Updated for 2025-26 Tax Year
+// Australian Tax Calculation
 function calculateMonthlySalary(annualSalary = appState.income.baseSalary) {
     if (!annualSalary) return 0;
 
@@ -636,19 +636,19 @@ function calculateMonthlySalary(annualSalary = appState.income.baseSalary) {
     
     // Tax-free threshold: $0 - $18,200
     if (annualSalary > 18200) {
-        // 16% on $18,201 - $45,000 (UPDATED from 19%)
+        // 16% on $18,201 - $45,000
         tax += Math.min(annualSalary - 18200, 45000 - 18200) * 0.16;
     }
     if (annualSalary > 45000) {
-        // 30% on $45,001 - $135,000 (UPDATED from 32.5% and $120,000)
+        // 30% on $45,001 - $135,000
         tax += Math.min(annualSalary - 45000, 135000 - 45000) * 0.30;
     }
     if (annualSalary > 135000) {
-        // 37% on $135,001 - $190,000 (UPDATED bracket start from $120,000 to $135,000)
+        // 37% on $135,001 - $190,000
         tax += Math.min(annualSalary - 135000, 190000 - 135000) * 0.37;
     }
     if (annualSalary > 190000) {
-        // 45% on $190,001+ (UPDATED from $180,001+)
+        // 45% on $190,001+
         tax += (annualSalary - 190000) * 0.45;
     }
 
@@ -660,8 +660,8 @@ function calculateMonthlySalary(annualSalary = appState.income.baseSalary) {
     const afterTax = annualSalary - tax;
     return afterTax / 12;
 }
-    
-// Currency Conversion with API - Updated to handle multiple accounts
+
+// Currency Conversion with API
 async function convertUSDToAUD(accountKey) {
     const convertBtn = document.getElementById(accountKey === 'stakeUSD' ? 'convert-btn-etf' : 'convert-btn-cash');
     convertBtn.disabled = true;
@@ -671,7 +671,7 @@ async function convertUSDToAUD(accountKey) {
         const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
         const data = await response.json();
         
-        let rate = 1.55; // Fallback rate
+        let rate = 1.55;
         if (data.rates && data.rates.AUD) {
             rate = data.rates.AUD;
         } else {
@@ -696,15 +696,13 @@ async function convertUSDToAUD(accountKey) {
     convertBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>';
 }
 
-// Calculate current totals - Updated for new account structure
+// Calculate current totals
 function getCurrentTotals() {
-    // Cash accounts: Up Bank + CDIA + Stake USD Cash + Stake AUD Cash
     const totalCash = appState.accounts.upBank.balance + 
                      appState.accounts.commBankCDIA.balance + 
                      appState.accounts.stakeUSDCash.balanceAUD + 
                      appState.accounts.stakeAUDCash.balance;
     
-    // Investment accounts: CommBank Pocket + CommSec + Stake USD ETFs
     const totalInvestments = appState.accounts.commBankPocket.balance + 
                             appState.accounts.commsec.balance + 
                             appState.accounts.stakeUSD.balanceAUD;
@@ -716,14 +714,11 @@ function getCurrentTotals() {
         totalNetWorth, 
         totalCash, 
         totalInvestments, 
-        tempAssetsTotal,
-        // Keep legacy field for compatibility
-        liquidCash: appState.accounts.upBank.balance,
-        investments: totalInvestments
+        tempAssetsTotal
     };
 }
 
-// Get effective salary for a given date (considering income changes)
+// Get effective salary for a given date
 function getEffectiveSalary(date) {
     if (!appState.income.isCalculated) return 0;
     
@@ -741,7 +736,7 @@ function getEffectiveSalary(date) {
     return calculateMonthlySalary(effectiveSalary);
 }
 
-// Generate monthly projections - Updated to use new total calculations
+// Generate monthly projections
 function generateProjections() {
     const results = [];
     const today = new Date();
@@ -757,27 +752,29 @@ function generateProjections() {
         
         const monthlySalary = getEffectiveSalary(projDate);
         
-        runningCash += monthlySalary;
-        runningCash -= monthlyExpenseTotal;
-        
-        const monthAdjustments = appState.adjustments.filter(a => 
-            a.enabled && a.date.startsWith(monthStr)
-        );
-        
-        monthAdjustments.forEach(adjustment => {
-            if (adjustment.type === 'income') {
-                runningCash += adjustment.amount;
-            } else {
-                runningCash -= adjustment.amount;
+        if (i > 0) {
+            runningCash += monthlySalary;
+            runningCash -= monthlyExpenseTotal;
+            
+            const monthAdjustments = appState.adjustments.filter(a => 
+                a.enabled && a.date.startsWith(monthStr)
+            );
+            
+            monthAdjustments.forEach(adjustment => {
+                if (adjustment.type === 'income') {
+                    runningCash += adjustment.amount;
+                } else {
+                    runningCash -= adjustment.amount;
+                }
+            });
+            
+            // Smart cash flow management
+            if (runningCash > appState.investmentScenarios.cashBuffer) {
+                const excessCash = runningCash - appState.investmentScenarios.cashBuffer;
+                const investAmount = excessCash * (appState.investmentScenarios.investmentRatio / 100);
+                runningInvestments += investAmount;
+                runningCash = appState.investmentScenarios.cashBuffer + (excessCash - investAmount);
             }
-        });
-        
-        // Smart cash flow management - invest excess cash
-        if (runningCash > appState.investmentScenarios.cashBuffer) {
-            const excessCash = runningCash - appState.investmentScenarios.cashBuffer;
-            const investAmount = excessCash * (appState.investmentScenarios.investmentRatio / 100);
-            runningInvestments += investAmount;
-            runningCash = appState.investmentScenarios.cashBuffer + (excessCash - investAmount);
         }
         
         const totalWealth = runningCash + runningInvestments + currentTotals.tempAssetsTotal;
@@ -825,33 +822,28 @@ function getCurrentMonthFlow() {
 
 // Tab Management
 function showTab(tabName) {
-    // Hide all content
     document.querySelectorAll('.tab-content').forEach(content => {
         content.classList.remove('active');
     });
     
-    // Reset all tab buttons
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.className = 'tab-btn flex items-center space-x-2 px-4 py-2 rounded-md transition-all text-slate-600 hover:bg-slate-100';
     });
     
-    // Show selected content and highlight button
     document.getElementById('content-' + tabName).classList.add('active');
     document.getElementById('tab-' + tabName).className = 'tab-btn flex items-center space-x-2 px-4 py-2 rounded-md transition-all bg-blue-500 text-white shadow-sm';
     
-    // Update content when switching tabs
     if (tabName === 'projections') {
         updateProjectionsTab();
     }
 }
 
-// Account Management - Updated for new accounts
+// Account Management
 function updateAccount(accountKey, field, value) {
     const numValue = parseCurrency(value);
     appState.accounts[accountKey][field] = numValue;
     appState.accounts[accountKey].lastUpdated = new Date().toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' });
     
-    // Update USD/AUD conversion if needed
     if ((accountKey === 'stakeUSD' || accountKey === 'stakeUSDCash') && field === 'balanceUSD') {
         appState.accounts[accountKey].balanceAUD = Math.round(numValue * appState.accounts[accountKey].exchangeRate);
         const audInputId = accountKey === 'stakeUSD' ? 'account-stakeUSD-AUD' : 'account-stakeUSDCash-AUD';
@@ -888,6 +880,7 @@ function calculateIncome() {
     updateDashboard();
     saveData();
 }
+
 function updatePayDate(value) {
     appState.income.payDate = parseInt(value);
     saveData();
@@ -1167,7 +1160,7 @@ function createWealthChart() {
                     beginAtZero: false,
                     ticks: {
                         callback: function(value) {
-                            return '$' + (value/1000).toFixed(0) + 'k';
+                            return ' + (value/1000).toFixed(0) + 'k';
                         }
                     }
                 }
@@ -1179,7 +1172,7 @@ function createWealthChart() {
                 tooltip: {
                     callbacks: {
                         label: function(context) {
-                            return context.dataset.label + ': $' + context.parsed.y.toLocaleString();
+                            return context.dataset.label + ':  + context.parsed.y.toLocaleString();
                         }
                     }
                 }
@@ -1258,7 +1251,7 @@ function createDetailedWealthChart() {
                     beginAtZero: false,
                     ticks: {
                         callback: function(value) {
-                            return '$' + (value/1000).toFixed(0) + 'k';
+                            return ' + (value/1000).toFixed(0) + 'k';
                         }
                     }
                 }
@@ -1270,7 +1263,7 @@ function createDetailedWealthChart() {
                 tooltip: {
                     callbacks: {
                         label: function(context) {
-                            return context.dataset.label + ': $' + context.parsed.y.toLocaleString();
+                            return context.dataset.label + ':  + context.parsed.y.toLocaleString();
                         }
                     }
                 }
@@ -1279,9 +1272,8 @@ function createDetailedWealthChart() {
     });
 }
 
-// Update Functions - Updated for new account structure
+// Update Functions
 function updateAccountsDisplay() {
-    // Update all account inputs
     document.getElementById('account-upBank').value = formatCurrency(appState.accounts.upBank.balance);
     document.getElementById('account-commBankPocket').value = formatCurrency(appState.accounts.commBankPocket.balance);
     document.getElementById('account-commsec').value = formatCurrency(appState.accounts.commsec.balance);
@@ -1292,7 +1284,6 @@ function updateAccountsDisplay() {
     document.getElementById('account-stakeUSDCash-AUD').value = formatCurrency(appState.accounts.stakeUSDCash.balanceAUD);
     document.getElementById('account-stakeAUDCash').value = formatCurrency(appState.accounts.stakeAUDCash.balance);
     
-    // Update dates
     document.getElementById('date-upBank').textContent = 'Updated: ' + appState.accounts.upBank.lastUpdated;
     document.getElementById('date-commBankPocket').textContent = 'Updated: ' + appState.accounts.commBankPocket.lastUpdated;
     document.getElementById('date-commsec').textContent = 'Updated: ' + appState.accounts.commsec.lastUpdated;
@@ -1301,11 +1292,9 @@ function updateAccountsDisplay() {
     document.getElementById('date-stakeUSDCash').textContent = 'Updated: ' + appState.accounts.stakeUSDCash.lastUpdated;
     document.getElementById('date-stakeAUDCash').textContent = 'Updated: ' + appState.accounts.stakeAUDCash.lastUpdated;
     
-    // Update exchange rates
     document.getElementById('exchange-rate-etf').textContent = appState.accounts.stakeUSD.exchangeRate;
     document.getElementById('exchange-rate-cash').textContent = appState.accounts.stakeUSDCash.exchangeRate;
     
-    // Update account totals
     const totals = getCurrentTotals();
     document.getElementById('accounts-total-cash').textContent = formatCurrency(totals.totalCash);
     document.getElementById('accounts-total-investments').textContent = formatCurrency(totals.totalInvestments);
@@ -1317,19 +1306,16 @@ function updatePlanningDisplay() {
     document.getElementById('monthly-after-tax').value = appState.income.isCalculated ? formatCurrency(appState.income.monthlySalary) : '$0';
     document.getElementById('pay-date').value = appState.income.payDate;
     
-    // Populate pay date options
     let payDateOptions = '';
     for (let i = 1; i <= 28; i++) {
         payDateOptions += `<option value="${i}" ${appState.income.payDate === i ? 'selected' : ''}>${i}</option>`;
     }
     document.getElementById('pay-date').innerHTML = payDateOptions;
     
-    // Update expenses
     Object.keys(appState.monthlyExpenses).forEach(key => {
         document.getElementById('expense-' + key).value = formatCurrency(appState.monthlyExpenses[key]);
     });
     
-    // Update investment scenarios
     document.getElementById('high-scenario').value = appState.investmentScenarios.highPercentage;
     document.getElementById('low-scenario').value = appState.investmentScenarios.lowPercentage;
     document.getElementById('cash-buffer').value = formatCurrency(appState.investmentScenarios.cashBuffer);
@@ -1374,7 +1360,6 @@ function updateSelectedDateProjection() {
 function updateProjectionsTab() {
     const projections = generateProjections();
     
-    // Update table
     const tableBody = document.getElementById('projections-table-body');
     let tableHtml = '';
     
@@ -1391,8 +1376,6 @@ function updateProjectionsTab() {
     });
     
     tableBody.innerHTML = tableHtml;
-    
-    // Update detailed chart
     createDetailedWealthChart();
 }
 
@@ -1400,37 +1383,42 @@ function updateDashboard() {
     const currentTotals = getCurrentTotals();
     const currentMonthFlow = getCurrentMonthFlow();
     
-    // Update key metrics - changed to show new totals structure
     document.getElementById('total-net-worth').textContent = formatCurrency(currentTotals.totalNetWorth);
     document.getElementById('total-cash').textContent = formatCurrency(currentTotals.totalCash);
     document.getElementById('total-investments').textContent = formatCurrency(currentTotals.totalInvestments);
     
-    // Update current month cash flow
     document.getElementById('current-month-income').textContent = formatCurrency(currentMonthFlow.income);
     document.getElementById('current-month-expenses').textContent = formatCurrency(currentMonthFlow.expenses);
     document.getElementById('current-month-net').textContent = (currentMonthFlow.net >= 0 ? '+' : '') + formatCurrency(currentMonthFlow.net);
     
-    // Update net flow color
     const netElement = document.getElementById('current-month-net');
     netElement.className = `text-xl font-bold ${currentMonthFlow.net >= 0 ? 'text-green-600' : 'text-red-600'}`;
     
-    // Update chart
     createWealthChart();
-    
-    // Update selected date projection
     updateSelectedDateProjection();
 }
 
 // Data Persistence
+function saveData() {
+    try {
+        appState.lastSyncTime = Date.now();
+        localStorage.setItem('advancedFinanceTracker', JSON.stringify(appState));
+        
+        if (googleDriveConnected && accessToken) {
+            saveToGoogleDrive();
+        }
+    } catch (e) {
+        console.error('Failed to save data:', e);
+    }
+}
+
 function loadData() {
     try {
         const saved = localStorage.getItem('advancedFinanceTracker');
         if (saved) {
             const loadedState = JSON.parse(saved);
-            // Merge with default state to handle new fields
             appState = { ...appState, ...loadedState };
             
-            // Ensure new accounts exist with defaults
             if (!appState.accounts.commBankCDIA) {
                 appState.accounts.commBankCDIA = { balance: 0, lastUpdated: '4 Aug 2025' };
             }
@@ -1445,3 +1433,274 @@ function loadData() {
         console.error('Failed to load data:', e);
     }
 }
+
+// Google Drive Functions
+async function initializeGapiClient() {
+    await gapi.client.init({
+        apiKey: GOOGLE_API_KEY,
+        discoveryDocs: [DISCOVERY_DOC],
+    });
+    gapiInited = true;
+    maybeEnableButtons();
+}
+
+function gisLoaded() {
+    tokenClient = google.accounts.oauth2.initTokenClient({
+        client_id: GOOGLE_CLIENT_ID,
+        scope: SCOPES,
+        callback: async (resp) => {
+            if (resp.error !== undefined) {
+                throw (resp);
+            }
+            accessToken = resp.access_token;
+            googleDriveConnected = true;
+            updateSyncStatus();
+            await loadFromGoogleDrive();
+        },
+    });
+    gisInited = true;
+    maybeEnableButtons();
+}
+
+function maybeEnableButtons() {
+    if (gapiInited && gisInited) {
+        document.getElementById('google-drive-btn').disabled = false;
+    }
+}
+
+function toggleGoogleDrive() {
+    if (googleDriveConnected) {
+        if (accessToken) {
+            google.accounts.oauth2.revoke(accessToken, () => {
+                console.log('Access token revoked');
+            });
+            accessToken = null;
+        }
+        googleDriveConnected = false;
+        updateSyncStatus();
+    } else {
+        tokenClient.requestAccessToken({prompt: 'consent'});
+    }
+}
+
+async function saveToGoogleDrive() {
+    if (!accessToken) return;
+    
+    try {
+        const fileName = 'finance-tracker-data.json';
+        const fileContent = JSON.stringify(appState, null, 2);
+        
+        const searchResponse = await gapi.client.drive.files.list({
+            q: `name='${fileName}' and trashed=false`,
+            spaces: 'drive',
+            fields: 'files(id, name)',
+        });
+        
+        const file = searchResponse.result.files?.[0];
+        const boundary = '-------314159265358979323846';
+        const delimiter = "\r\n--" + boundary + "\r\n";
+        const close_delim = "\r\n--" + boundary + "--";
+        
+        const metadata = {
+            'name': fileName,
+            'mimeType': 'application/json'
+        };
+        
+        const multipartRequestBody =
+            delimiter +
+            'Content-Type: application/json\r\n\r\n' +
+            JSON.stringify(metadata) +
+            delimiter +
+            'Content-Type: application/json\r\n\r\n' +
+            fileContent +
+            close_delim;
+        
+        let request;
+        if (file) {
+            request = gapi.client.request({
+                'path': `/upload/drive/v3/files/${file.id}`,
+                'method': 'PATCH',
+                'params': {'uploadType': 'multipart'},
+                'headers': {
+                    'Content-Type': 'multipart/related; boundary="' + boundary + '"'
+                },
+                'body': multipartRequestBody
+            });
+        } else {
+            request = gapi.client.request({
+                'path': '/upload/drive/v3/files',
+                'method': 'POST',
+                'params': {'uploadType': 'multipart'},
+                'headers': {
+                    'Content-Type': 'multipart/related; boundary="' + boundary + '"'
+                },
+                'body': multipartRequestBody
+            });
+        }
+        
+        await request.execute();
+        console.log('Data saved to Google Drive');
+        updateSyncStatus('synced');
+    } catch (error) {
+        console.error('Error saving to Google Drive:', error);
+        updateSyncStatus('error');
+    }
+}
+
+async function loadFromGoogleDrive() {
+    if (!accessToken) return;
+    
+    try {
+        const fileName = 'finance-tracker-data.json';
+        
+        const searchResponse = await gapi.client.drive.files.list({
+            q: `name='${fileName}' and trashed=false`,
+            spaces: 'drive',
+            fields: 'files(id, name)',
+        });
+        
+        const file = searchResponse.result.files?.[0];
+        
+        if (file) {
+            const response = await gapi.client.drive.files.get({
+                fileId: file.id,
+                alt: 'media'
+            });
+            
+            const driveData = JSON.parse(response.body);
+            
+            const localData = localStorage.getItem('advancedFinanceTracker');
+            if (localData) {
+                const localState = JSON.parse(localData);
+                const driveDate = new Date(driveData.lastSyncTime || 0);
+                const localDate = new Date(localState.lastSyncTime || 0);
+                
+                if (driveDate > localDate) {
+                    if (confirm('Google Drive has newer data. Load from Drive?')) {
+                        appState = driveData;
+                        saveData();
+                        location.reload();
+                    }
+                } else if (localDate > driveDate) {
+                    if (confirm('Local data is newer. Upload to Google Drive?')) {
+                        await saveToGoogleDrive();
+                    }
+                }
+            } else {
+                appState = driveData;
+                localStorage.setItem('advancedFinanceTracker', JSON.stringify(appState));
+                location.reload();
+            }
+        } else {
+            await saveToGoogleDrive();
+        }
+        
+        console.log('Google Drive connected successfully');
+    } catch (error) {
+        console.error('Error loading from Google Drive:', error);
+    }
+}
+
+function updateSyncStatus(status = 'connected') {
+    const statusElement = document.getElementById('sync-status');
+    const btnText = document.getElementById('google-drive-btn-text');
+    
+    if (googleDriveConnected) {
+        if (status === 'synced') {
+            statusElement.textContent = 'Synced with Google Drive ✓';
+            statusElement.className = 'text-xs text-green-600 mt-1';
+        } else if (status === 'error') {
+            statusElement.textContent = 'Google Drive sync error - data saved locally';
+            statusElement.className = 'text-xs text-red-600 mt-1';
+        } else {
+            statusElement.textContent = 'Connected to Google Drive';
+            statusElement.className = 'text-xs text-green-600 mt-1';
+        }
+        btnText.textContent = 'Disconnect Google Drive';
+    } else {
+        statusElement.textContent = 'Local storage only - Google Drive not connected';
+        statusElement.className = 'text-xs text-amber-600 mt-1';
+        btnText.textContent = 'Connect Google Drive';
+    }
+}
+
+// Export/Import Functions
+function exportData() {
+    const dataStr = JSON.stringify(appState, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `finance-tracker-backup-${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    alert('Data exported successfully! Check your Downloads folder.');
+}
+
+function importData() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        try {
+            const text = await file.text();
+            const importedData = JSON.parse(text);
+            
+            if (confirm('This will replace all current data. Are you sure?')) {
+                appState = importedData;
+                saveData();
+                location.reload();
+            }
+        } catch (error) {
+            alert('Failed to import data. Please check the file format.');
+            console.error('Import error:', error);
+        }
+    };
+    input.click();
+}
+
+// Initialization
+function initializeApp() {
+    loadData();
+    
+    // Initialize Google APIs
+    if (typeof gapi !== 'undefined') {
+        gapi.load('client', initializeGapiClient);
+    }
+    if (typeof google !== 'undefined' && google.accounts) {
+        gisLoaded();
+    }
+    
+    if (!appState.lastSyncTime) {
+        appState.lastSyncTime = Date.now();
+    }
+    
+    document.getElementById('projection-date').value = appState.selectedDate;
+    document.getElementById('projection-date').min = new Date().toISOString().slice(0, 10);
+    
+    updateAccountsDisplay();
+    updatePlanningDisplay();
+    
+    if (appState.income.baseSalary > 0 && !appState.income.isCalculated) {
+        calculateIncome();
+    }
+    
+    renderTemporaryAssets();
+    renderIncomeChanges();
+    renderAdjustments();
+    updateDashboard();
+    
+    console.log('Enhanced Finance Tracker with Google Drive loaded successfully!');
+}
+
+// Event Listeners
+document.addEventListener('DOMContentLoaded', initializeApp);
+window.addEventListener('beforeunload', saveData);
+</script>
+</body>
+</html>
