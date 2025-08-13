@@ -382,6 +382,207 @@ function importData() {
     input.click();
 }
 
+// Google Drive Functions
+async function initializeGapiClient() {
+    try {
+        await gapi.client.init({
+            apiKey: GOOGLE_API_KEY,
+            discoveryDocs: [DISCOVERY_DOC],
+        });
+        gapiInited = true;
+        maybeEnableButtons();
+        console.log('Google API client initialized');
+    } catch (error) {
+        console.error('Error initializing GAPI client:', error);
+    }
+}
+
+function gisLoaded() {
+    tokenClient = google.accounts.oauth2.initTokenClient({
+        client_id: GOOGLE_CLIENT_ID,
+        scope: SCOPES,
+        callback: async (resp) => {
+            if (resp.error !== undefined) {
+                throw (resp);
+            }
+            accessToken = resp.access_token;
+            googleDriveConnected = true;
+            updateSyncStatus();
+            await loadFromGoogleDrive();
+        },
+    });
+    gisInited = true;
+    maybeEnableButtons();
+    console.log('Google Identity Services loaded');
+}
+
+function maybeEnableButtons() {
+    if (gapiInited && gisInited) {
+        document.getElementById('google-drive-btn').disabled = false;
+        console.log('Google Drive button enabled');
+    }
+}
+
+function toggleGoogleDrive() {
+    if (googleDriveConnected) {
+        // Disconnect
+        if (accessToken) {
+            google.accounts.oauth2.revoke(accessToken, () => {
+                console.log('Access token revoked');
+            });
+            accessToken = null;
+        }
+        googleDriveConnected = false;
+        updateSyncStatus();
+    } else {
+        // Connect
+        tokenClient.requestAccessToken({prompt: 'consent'});
+    }
+}
+
+async function saveToGoogleDrive() {
+    if (!accessToken) return;
+    
+    try {
+        const fileName = 'finance-tracker-data.json';
+        const fileContent = JSON.stringify(appState, null, 2);
+        
+        const searchResponse = await gapi.client.drive.files.list({
+            q: `name='${fileName}' and trashed=false`,
+            spaces: 'drive',
+            fields: 'files(id, name)',
+        });
+        
+        const file = searchResponse.result.files?.[0];
+        const boundary = '-------314159265358979323846';
+        const delimiter = "\r\n--" + boundary + "\r\n";
+        const close_delim = "\r\n--" + boundary + "--";
+        
+        const metadata = {
+            'name': fileName,
+            'mimeType': 'application/json'
+        };
+        
+        const multipartRequestBody =
+            delimiter +
+            'Content-Type: application/json\r\n\r\n' +
+            JSON.stringify(metadata) +
+            delimiter +
+            'Content-Type: application/json\r\n\r\n' +
+            fileContent +
+            close_delim;
+        
+        let request;
+        if (file) {
+            request = gapi.client.request({
+                'path': `/upload/drive/v3/files/${file.id}`,
+                'method': 'PATCH',
+                'params': {'uploadType': 'multipart'},
+                'headers': {
+                    'Content-Type': 'multipart/related; boundary="' + boundary + '"'
+                },
+                'body': multipartRequestBody
+            });
+        } else {
+            request = gapi.client.request({
+                'path': '/upload/drive/v3/files',
+                'method': 'POST',
+                'params': {'uploadType': 'multipart'},
+                'headers': {
+                    'Content-Type': 'multipart/related; boundary="' + boundary + '"'
+                },
+                'body': multipartRequestBody
+            });
+        }
+        
+        await request.execute();
+        console.log('Data saved to Google Drive');
+        updateSyncStatus('synced');
+    } catch (error) {
+        console.error('Error saving to Google Drive:', error);
+        updateSyncStatus('error');
+    }
+}
+
+async function loadFromGoogleDrive() {
+    if (!accessToken) return;
+    
+    try {
+        const fileName = 'finance-tracker-data.json';
+        
+        const searchResponse = await gapi.client.drive.files.list({
+            q: `name='${fileName}' and trashed=false`,
+            spaces: 'drive',
+            fields: 'files(id, name)',
+        });
+        
+        const file = searchResponse.result.files?.[0];
+        
+        if (file) {
+            const response = await gapi.client.drive.files.get({
+                fileId: file.id,
+                alt: 'media'
+            });
+            
+            const driveData = JSON.parse(response.body);
+            
+            const localData = localStorage.getItem('advancedFinanceTracker');
+            if (localData) {
+                const localState = JSON.parse(localData);
+                const driveDate = new Date(driveData.lastSyncTime || 0);
+                const localDate = new Date(localState.lastSyncTime || 0);
+                
+                if (driveDate > localDate) {
+                    if (confirm('Google Drive has newer data. Load from Drive and replace local data?')) {
+                        appState = driveData;
+                        saveData();
+                        location.reload();
+                    }
+                } else if (localDate > driveDate) {
+                    if (confirm('Local data is newer. Upload to Google Drive?')) {
+                        await saveToGoogleDrive();
+                    }
+                }
+            } else {
+                appState = driveData;
+                localStorage.setItem('advancedFinanceTracker', JSON.stringify(appState));
+                location.reload();
+            }
+        } else {
+            // No existing file, upload current data
+            await saveToGoogleDrive();
+        }
+        
+        console.log('Google Drive sync completed');
+    } catch (error) {
+        console.error('Error loading from Google Drive:', error);
+        updateSyncStatus('error');
+    }
+}
+
+function updateSyncStatus(status = 'connected') {
+    const statusElement = document.getElementById('sync-status');
+    const btnText = document.getElementById('google-drive-btn-text');
+    
+    if (googleDriveConnected) {
+        if (status === 'synced') {
+            statusElement.textContent = 'Synced with Google Drive ✓';
+            statusElement.className = 'text-xs text-green-600 mt-1';
+        } else if (status === 'error') {
+            statusElement.textContent = 'Google Drive sync error - data saved locally';
+            statusElement.className = 'text-xs text-red-600 mt-1';
+        } else {
+            statusElement.textContent = 'Connected to Google Drive';
+            statusElement.className = 'text-xs text-green-600 mt-1';
+        }
+        btnText.textContent = 'Disconnect Google Drive';
+    } else {
+        statusElement.textContent = 'Local storage only - Google Drive not connected';
+        statusElement.className = 'text-xs text-amber-600 mt-1';
+        btnText.textContent = 'Connect Google Drive';
+    }
+}
+
 // Make all functions globally accessible immediately
 window.showTab = showTab;
 window.updateAccount = updateAccount;
@@ -391,6 +592,7 @@ window.calculateIncome = calculateIncome;
 window.updatePayDate = updatePayDate;
 window.exportData = exportData;
 window.importData = importData;
+window.toggleGoogleDrive = toggleGoogleDrive;
 
 console.log('Core functions loaded and exposed globally');
 </script>
@@ -460,6 +662,12 @@ console.log('Core functions loaded and exposed globally');
                                 </button>
                                 <button onclick="importData()" class="px-3 py-2 bg-amber-500 text-white rounded-md hover:bg-amber-600 text-sm">
                                     Import Data
+                                </button>
+                                <button onclick="toggleGoogleDrive()" id="google-drive-btn" class="px-3 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 text-sm flex items-center space-x-1">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M8.5 7L15 17h6l-6.5-10zm-1.3 0L1 17h6.5L11 11zm7.3 11L11 12 7.5 18z"/>
+                                    </svg>
+                                    <span id="google-drive-btn-text">Connect Google Drive</span>
                                 </button>
                             </div>
                         </div>
