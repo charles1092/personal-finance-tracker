@@ -888,3 +888,560 @@ function calculateIncome() {
     updateDashboard();
     saveData();
 }
+function updatePayDate(value) {
+    appState.income.payDate = parseInt(value);
+    saveData();
+}
+
+// Income Changes Management
+function addIncomeChange() {
+    const newId = Math.max(...appState.incomeChanges.map(ic => ic.id), 0) + 1;
+    appState.incomeChanges.push({
+        id: newId,
+        description: "Salary increase",
+        newSalary: appState.income.baseSalary,
+        effectiveDate: new Date().toISOString().slice(0, 10),
+        enabled: true
+    });
+    renderIncomeChanges();
+    updateDashboard();
+    saveData();
+}
+
+function updateIncomeChange(id, field, value) {
+    const index = appState.incomeChanges.findIndex(ic => ic.id === id);
+    if (index !== -1) {
+        if (field === 'newSalary') {
+            appState.incomeChanges[index][field] = parseCurrency(value);
+        } else {
+            appState.incomeChanges[index][field] = value;
+        }
+        updateDashboard();
+        saveData();
+    }
+}
+
+function deleteIncomeChange(id) {
+    appState.incomeChanges = appState.incomeChanges.filter(ic => ic.id !== id);
+    renderIncomeChanges();
+    updateDashboard();
+    saveData();
+}
+
+// Monthly Expenses Management
+function updateMonthlyExpenses() {
+    const expenseTypes = ['rent', 'utilities', 'groceries', 'transport', 'entertainment', 'other'];
+    let total = 0;
+    
+    expenseTypes.forEach(type => {
+        const value = parseCurrency(document.getElementById('expense-' + type).value);
+        appState.monthlyExpenses[type] = value;
+        total += value;
+    });
+    
+    document.getElementById('total-monthly-expenses').textContent = formatCurrency(total);
+    updateDashboard();
+    saveData();
+}
+
+// Adjustments Management
+function addAdjustment() {
+    const newId = Math.max(...appState.adjustments.map(a => a.id), 0) + 1;
+    appState.adjustments.push({
+        id: newId,
+        description: "New Event",
+        amount: 0,
+        date: new Date().toISOString().slice(0, 10),
+        type: "expense",
+        enabled: true
+    });
+    renderAdjustments();
+    updateDashboard();
+    saveData();
+}
+
+function updateAdjustment(id, field, value) {
+    const index = appState.adjustments.findIndex(a => a.id === id);
+    if (index !== -1) {
+        if (field === 'amount') {
+            appState.adjustments[index][field] = parseCurrency(value);
+        } else {
+            appState.adjustments[index][field] = value;
+        }
+        updateDashboard();
+        saveData();
+    }
+}
+
+function deleteAdjustment(id) {
+    appState.adjustments = appState.adjustments.filter(a => a.id !== id);
+    renderAdjustments();
+    updateDashboard();
+    saveData();
+}
+
+// Temporary Assets Management
+function addTemporaryAsset() {
+    const newId = Math.max(...appState.temporaryAssets.map(a => a.id), 0) + 1;
+    appState.temporaryAssets.push({
+        id: newId,
+        description: "New temporary asset",
+        amount: 0,
+        returnDate: new Date().toISOString().slice(0, 10)
+    });
+    renderTemporaryAssets();
+    updateDashboard();
+    saveData();
+}
+
+function updateTemporaryAsset(id, field, value) {
+    const index = appState.temporaryAssets.findIndex(a => a.id === id);
+    if (index !== -1) {
+        if (field === 'amount') {
+            appState.temporaryAssets[index][field] = parseCurrency(value);
+        } else {
+            appState.temporaryAssets[index][field] = value;
+        }
+        updateDashboard();
+        saveData();
+    }
+}
+
+function deleteTemporaryAsset(id) {
+    appState.temporaryAssets = appState.temporaryAssets.filter(a => a.id !== id);
+    renderTemporaryAssets();
+    updateDashboard();
+    saveData();
+}
+
+// Investment Scenarios Management
+function updateInvestmentScenarios() {
+    appState.investmentScenarios.highPercentage = parseFloat(document.getElementById('high-scenario').value) || 0;
+    appState.investmentScenarios.lowPercentage = parseFloat(document.getElementById('low-scenario').value) || 0;
+    appState.investmentScenarios.cashBuffer = parseCurrency(document.getElementById('cash-buffer').value);
+    appState.investmentScenarios.investmentRatio = parseFloat(document.getElementById('investment-ratio').value) || 0;
+    updateDashboard();
+    saveData();
+}
+
+function updateProjectionMonths(value) {
+    appState.projectionMonths = parseInt(value);
+    updateDashboard();
+    saveData();
+}
+
+// Rendering Functions
+function renderTemporaryAssets() {
+    const container = document.getElementById('temporary-assets-list');
+    
+    if (appState.temporaryAssets.length === 0) {
+        container.innerHTML = '<p class="text-slate-500 text-center py-4">No temporary assets added yet</p>';
+        return;
+    }
+    
+    let html = '';
+    appState.temporaryAssets.forEach(asset => {
+        html += `
+        <div class="flex flex-wrap space-x-3 items-center p-3 bg-slate-50 rounded-lg gap-2">
+            <input type="text" value="${asset.description}" onchange="updateTemporaryAsset(${asset.id}, 'description', this.value)" class="flex-1 min-w-48 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500" placeholder="Description">
+            <input type="text" value="${formatCurrency(asset.amount)}" onchange="updateTemporaryAsset(${asset.id}, 'amount', this.value)" class="w-32 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500" placeholder="$0">
+            <input type="date" value="${asset.returnDate}" onchange="updateTemporaryAsset(${asset.id}, 'returnDate', this.value)" class="w-40 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500">
+            <button onclick="deleteTemporaryAsset(${asset.id})" class="p-2 text-red-500 hover:bg-red-50 rounded-md">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="3,6 5,6 21,6"></polyline>
+                    <path d="M19,6V20a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6M8,6V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2V6"></path>
+                </svg>
+            </button>
+        </div>`;
+    });
+    
+    container.innerHTML = html;
+}
+
+function renderIncomeChanges() {
+    const container = document.getElementById('income-changes-list');
+    
+    if (appState.incomeChanges.length === 0) {
+        container.innerHTML = '<p class="text-slate-500 text-center py-4">No future income changes planned</p>';
+        return;
+    }
+    
+    let html = '';
+    appState.incomeChanges.forEach(incomeChange => {
+        const eyeIcon = incomeChange.enabled ? 
+            '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>' :
+            '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+        
+        html += `
+        <div class="flex flex-wrap space-x-3 items-center p-3 bg-slate-50 rounded-lg gap-2">
+            <button onclick="updateIncomeChange(${incomeChange.id}, 'enabled', ${!incomeChange.enabled})" class="p-2 rounded-md ${incomeChange.enabled ? 'text-green-600 bg-green-50' : 'text-slate-400 bg-slate-100'}">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${eyeIcon}</svg>
+            </button>
+            <input type="text" value="${incomeChange.description}" onchange="updateIncomeChange(${incomeChange.id}, 'description', this.value)" class="flex-1 min-w-48 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500" placeholder="Description (e.g., Promotion, New job)">
+            <input type="text" value="${formatCurrency(incomeChange.newSalary)}" onchange="updateIncomeChange(${incomeChange.id}, 'newSalary', this.value)" class="w-40 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500" placeholder="New annual salary">
+            <input type="date" value="${incomeChange.effectiveDate}" onchange="updateIncomeChange(${incomeChange.id}, 'effectiveDate', this.value)" class="w-40 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500">
+            <button onclick="deleteIncomeChange(${incomeChange.id})" class="p-2 text-red-500 hover:bg-red-50 rounded-md">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="3,6 5,6 21,6"></polyline>
+                    <path d="M19,6V20a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6M8,6V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2V6"></path>
+                </svg>
+            </button>
+        </div>`;
+    });
+    
+    container.innerHTML = html;
+}
+
+function renderAdjustments() {
+    const container = document.getElementById('adjustments-list');
+    
+    if (appState.adjustments.length === 0) {
+        container.innerHTML = '<p class="text-slate-500 text-center py-4">No adjustments added yet</p>';
+        return;
+    }
+    
+    let html = '';
+    appState.adjustments.forEach(adjustment => {
+        const eyeIcon = adjustment.enabled ? 
+            '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>' :
+            '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+        
+        html += `
+        <div class="flex flex-wrap space-x-3 items-center p-3 bg-slate-50 rounded-lg gap-2">
+            <button onclick="updateAdjustment(${adjustment.id}, 'enabled', ${!adjustment.enabled})" class="p-2 rounded-md ${adjustment.enabled ? 'text-green-600 bg-green-50' : 'text-slate-400 bg-slate-100'}">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${eyeIcon}</svg>
+            </button>
+            <select onchange="updateAdjustment(${adjustment.id}, 'type', this.value)" class="w-32 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 text-sm">
+                <option value="income" ${adjustment.type === 'income' ? 'selected' : ''}>Income</option>
+                <option value="expense" ${adjustment.type === 'expense' ? 'selected' : ''}>Expense</option>
+            </select>
+            <input type="text" value="${adjustment.description}" onchange="updateAdjustment(${adjustment.id}, 'description', this.value)" class="flex-1 min-w-48 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500" placeholder="Description">
+            <input type="text" value="${formatCurrency(adjustment.amount)}" onchange="updateAdjustment(${adjustment.id}, 'amount', this.value)" class="w-32 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500" placeholder="$0">
+            <input type="date" value="${adjustment.date}" onchange="updateAdjustment(${adjustment.id}, 'date', this.value)" class="w-40 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500">
+            <button onclick="deleteAdjustment(${adjustment.id})" class="p-2 text-red-500 hover:bg-red-50 rounded-md">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="3,6 5,6 21,6"></polyline>
+                    <path d="M19,6V20a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6M8,6V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2V6"></path>
+                </svg>
+            </button>
+        </div>`;
+    });
+    
+    container.innerHTML = html;
+}
+
+// Chart Management
+let wealthChart = null;
+let detailedWealthChart = null;
+
+function createWealthChart() {
+    const ctx = document.getElementById('wealth-chart').getContext('2d');
+    const projections = generateProjections();
+    const chartData = projections.slice(0, 13);
+    
+    if (wealthChart) {
+        wealthChart.destroy();
+    }
+    
+    wealthChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: chartData.map(p => p.month),
+            datasets: [
+                {
+                    label: 'Base Scenario',
+                    data: chartData.map(p => p.total),
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    borderWidth: 3,
+                    fill: false,
+                    tension: 0.1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    ticks: {
+                        callback: function(value) {
+                            return '$' + (value/1000).toFixed(0) + 'k';
+                        }
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.dataset.label + ': $' + context.parsed.y.toLocaleString();
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function createDetailedWealthChart() {
+    const ctx = document.getElementById('detailed-wealth-chart').getContext('2d');
+    const projections = generateProjections();
+    
+    if (detailedWealthChart) {
+        detailedWealthChart.destroy();
+    }
+    
+    detailedWealthChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: projections.map(p => p.month),
+            datasets: [
+                {
+                    label: 'Cash',
+                    data: projections.map(p => p.cash),
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    borderWidth: 2,
+                    fill: false,
+                    tension: 0.1
+                },
+                {
+                    label: 'Investments',
+                    data: projections.map(p => p.investments),
+                    borderColor: '#8b5cf6',
+                    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                    borderWidth: 2,
+                    fill: false,
+                    tension: 0.1
+                },
+                {
+                    label: 'Total Wealth',
+                    data: projections.map(p => p.total),
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    borderWidth: 3,
+                    fill: false,
+                    tension: 0.1
+                },
+                {
+                    label: 'High Scenario',
+                    data: projections.map(p => p.totalHigh),
+                    borderColor: '#22c55e',
+                    backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    fill: false,
+                    tension: 0.1
+                },
+                {
+                    label: 'Low Scenario',
+                    data: projections.map(p => p.totalLow),
+                    borderColor: '#ef4444',
+                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    fill: false,
+                    tension: 0.1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    ticks: {
+                        callback: function(value) {
+                            return '$' + (value/1000).toFixed(0) + 'k';
+                        }
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.dataset.label + ': $' + context.parsed.y.toLocaleString();
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Update Functions - Updated for new account structure
+function updateAccountsDisplay() {
+    // Update all account inputs
+    document.getElementById('account-upBank').value = formatCurrency(appState.accounts.upBank.balance);
+    document.getElementById('account-commBankPocket').value = formatCurrency(appState.accounts.commBankPocket.balance);
+    document.getElementById('account-commsec').value = formatCurrency(appState.accounts.commsec.balance);
+    document.getElementById('account-commBankCDIA').value = formatCurrency(appState.accounts.commBankCDIA.balance);
+    document.getElementById('account-stakeUSD-USD').value = formatCurrency(appState.accounts.stakeUSD.balanceUSD);
+    document.getElementById('account-stakeUSD-AUD').value = formatCurrency(appState.accounts.stakeUSD.balanceAUD);
+    document.getElementById('account-stakeUSDCash-USD').value = formatCurrency(appState.accounts.stakeUSDCash.balanceUSD);
+    document.getElementById('account-stakeUSDCash-AUD').value = formatCurrency(appState.accounts.stakeUSDCash.balanceAUD);
+    document.getElementById('account-stakeAUDCash').value = formatCurrency(appState.accounts.stakeAUDCash.balance);
+    
+    // Update dates
+    document.getElementById('date-upBank').textContent = 'Updated: ' + appState.accounts.upBank.lastUpdated;
+    document.getElementById('date-commBankPocket').textContent = 'Updated: ' + appState.accounts.commBankPocket.lastUpdated;
+    document.getElementById('date-commsec').textContent = 'Updated: ' + appState.accounts.commsec.lastUpdated;
+    document.getElementById('date-commBankCDIA').textContent = 'Updated: ' + appState.accounts.commBankCDIA.lastUpdated;
+    document.getElementById('date-stakeUSD').textContent = 'Updated: ' + appState.accounts.stakeUSD.lastUpdated;
+    document.getElementById('date-stakeUSDCash').textContent = 'Updated: ' + appState.accounts.stakeUSDCash.lastUpdated;
+    document.getElementById('date-stakeAUDCash').textContent = 'Updated: ' + appState.accounts.stakeAUDCash.lastUpdated;
+    
+    // Update exchange rates
+    document.getElementById('exchange-rate-etf').textContent = appState.accounts.stakeUSD.exchangeRate;
+    document.getElementById('exchange-rate-cash').textContent = appState.accounts.stakeUSDCash.exchangeRate;
+    
+    // Update account totals
+    const totals = getCurrentTotals();
+    document.getElementById('accounts-total-cash').textContent = formatCurrency(totals.totalCash);
+    document.getElementById('accounts-total-investments').textContent = formatCurrency(totals.totalInvestments);
+    document.getElementById('accounts-grand-total').textContent = formatCurrency(totals.totalNetWorth);
+}
+
+function updatePlanningDisplay() {
+    document.getElementById('base-salary').value = formatCurrency(appState.income.baseSalary);
+    document.getElementById('monthly-after-tax').value = appState.income.isCalculated ? formatCurrency(appState.income.monthlySalary) : '$0';
+    document.getElementById('pay-date').value = appState.income.payDate;
+    
+    // Populate pay date options
+    let payDateOptions = '';
+    for (let i = 1; i <= 28; i++) {
+        payDateOptions += `<option value="${i}" ${appState.income.payDate === i ? 'selected' : ''}>${i}</option>`;
+    }
+    document.getElementById('pay-date').innerHTML = payDateOptions;
+    
+    // Update expenses
+    Object.keys(appState.monthlyExpenses).forEach(key => {
+        document.getElementById('expense-' + key).value = formatCurrency(appState.monthlyExpenses[key]);
+    });
+    
+    // Update investment scenarios
+    document.getElementById('high-scenario').value = appState.investmentScenarios.highPercentage;
+    document.getElementById('low-scenario').value = appState.investmentScenarios.lowPercentage;
+    document.getElementById('cash-buffer').value = formatCurrency(appState.investmentScenarios.cashBuffer);
+    document.getElementById('investment-ratio').value = appState.investmentScenarios.investmentRatio;
+    
+    const monthlyExpenseTotal = Object.values(appState.monthlyExpenses).reduce((sum, exp) => sum + exp, 0);
+    document.getElementById('total-monthly-expenses').textContent = formatCurrency(monthlyExpenseTotal);
+}
+
+function updateSelectedDateProjection() {
+    const selectedDate = document.getElementById('projection-date').value;
+    if (!selectedDate) return;
+    
+    const selected = new Date(selectedDate);
+    const today = new Date();
+    const monthsDiff = (selected.getFullYear() - today.getFullYear()) * 12 + 
+                      (selected.getMonth() - today.getMonth());
+    
+    if (monthsDiff < 0) return;
+    
+    const projections = generateProjections();
+    const projection = projections[Math.min(monthsDiff, projections.length - 1)];
+    
+    if (projection) {
+        document.getElementById('selected-date-projection').innerHTML = `
+            <div class="text-center p-4 bg-blue-50 rounded-lg">
+                <p class="text-sm text-slate-600 mb-1">Base Scenario</p>
+                <p class="text-2xl font-bold text-blue-600">${formatCurrency(projection.total)}</p>
+            </div>
+            <div class="text-center p-4 bg-green-50 rounded-lg">
+                <p class="text-sm text-slate-600 mb-1">High Scenario (+${appState.investmentScenarios.highPercentage}%)</p>
+                <p class="text-2xl font-bold text-green-600">${formatCurrency(projection.totalHigh)}</p>
+            </div>
+            <div class="text-center p-4 bg-red-50 rounded-lg">
+                <p class="text-sm text-slate-600 mb-1">Low Scenario (${appState.investmentScenarios.lowPercentage}%)</p>
+                <p class="text-2xl font-bold text-red-600">${formatCurrency(projection.totalLow)}</p>
+            </div>
+        `;
+    }
+}
+
+function updateProjectionsTab() {
+    const projections = generateProjections();
+    
+    // Update table
+    const tableBody = document.getElementById('projections-table-body');
+    let tableHtml = '';
+    
+    projections.slice(0, 13).forEach(proj => {
+        tableHtml += `
+        <tr class="border-b border-slate-100">
+            <td class="py-2 px-3 text-slate-700">${proj.month}</td>
+            <td class="py-2 px-3 text-right text-green-600">${formatCurrency(proj.cash)}</td>
+            <td class="py-2 px-3 text-right text-purple-600">${formatCurrency(proj.investments)}</td>
+            <td class="py-2 px-3 text-right font-medium text-slate-800">${formatCurrency(proj.total)}</td>
+            <td class="py-2 px-3 text-right text-green-600">${formatCurrency(proj.totalHigh)}</td>
+            <td class="py-2 px-3 text-right text-red-600">${formatCurrency(proj.totalLow)}</td>
+        </tr>`;
+    });
+    
+    tableBody.innerHTML = tableHtml;
+    
+    // Update detailed chart
+    createDetailedWealthChart();
+}
+
+function updateDashboard() {
+    const currentTotals = getCurrentTotals();
+    const currentMonthFlow = getCurrentMonthFlow();
+    
+    // Update key metrics - changed to show new totals structure
+    document.getElementById('total-net-worth').textContent = formatCurrency(currentTotals.totalNetWorth);
+    document.getElementById('total-cash').textContent = formatCurrency(currentTotals.totalCash);
+    document.getElementById('total-investments').textContent = formatCurrency(currentTotals.totalInvestments);
+    
+    // Update current month cash flow
+    document.getElementById('current-month-income').textContent = formatCurrency(currentMonthFlow.income);
+    document.getElementById('current-month-expenses').textContent = formatCurrency(currentMonthFlow.expenses);
+    document.getElementById('current-month-net').textContent = (currentMonthFlow.net >= 0 ? '+' : '') + formatCurrency(currentMonthFlow.net);
+    
+    // Update net flow color
+    const netElement = document.getElementById('current-month-net');
+    netElement.className = `text-xl font-bold ${currentMonthFlow.net >= 0 ? 'text-green-600' : 'text-red-600'}`;
+    
+    // Update chart
+    createWealthChart();
+    
+    // Update selected date projection
+    updateSelectedDateProjection();
+}
+
+// Data Persistence
+function loadData() {
+    try {
+        const saved = localStorage.getItem('advancedFinanceTracker');
+        if (saved) {
+            const loadedState = JSON.parse(saved);
+            // Merge with default state to handle new fields
+            appState = { ...appState, ...loadedState };
+            
+            // Ensure new accounts exist with defaults
+            if (!appState.accounts.commBankCDIA) {
+                appState.accounts.commBankCDIA = { balance: 0, lastUpdated: '4 Aug 2025' };
+            }
+            if (!appState.accounts.stakeUSDCash) {
+                appState.accounts.stakeUSDCash = { balanceUSD: 0, balanceAUD: 0, exchangeRate: 1.6, lastUpdated: '4 Aug 2025' };
+            }
+            if (!appState.accounts.stakeAUDCash) {
+                appState.accounts.stakeAUDCash = { balance: 0, lastUpdated: '4 Aug 2025' };
+            }
+        }
+    } catch (e) {
+        console.error('Failed to load data:', e);
+    }
+}
